@@ -35,7 +35,13 @@ body { background:#000; overflow:hidden; width:100vw; height:100dvh; font-family
 #rpm-number { font-size:.72rem; font-weight:700; color:#aaa; letter-spacing:.04em; margin-top:3px; line-height:1; }
 #gear-display { margin-top:4px; font-size:1.5rem; font-weight:900; color:#f0c040; text-shadow:0 0 14px #f0c04088; line-height:1; }
 #gear-big { display:none; }
-#options-wrap { position:fixed; top:8px; right:10px; z-index:215; }
+#options-wrap { position:fixed; top:8px; right:10px; z-index:215; display:flex; gap:6px; align-items:center; }
+#btn-cam { pointer-events:all; background:rgba(255,255,255,.1); border:1.5px solid rgba(255,255,255,.28); color:#fff; font-family:'Courier New',monospace; font-size:.55rem; letter-spacing:.12em; font-weight:700; padding:0; width:44px; height:30px; border-radius:8px; cursor:pointer; transition:background .15s, border-color .15s, color .15s; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:1px; line-height:1; }
+#btn-cam svg { display:block; }
+#btn-cam.cam-hood { background:rgba(48,224,96,.15); border-color:#30e060; color:#30e060; }
+#btn-cam.cam-hood svg path,#btn-cam.cam-hood svg rect,#btn-cam.cam-hood svg circle { stroke:#30e060; }
+#btn-cam.cam-bumper { background:rgba(240,192,64,.15); border-color:#f0c040; color:#f0c040; }
+#btn-cam.cam-bumper svg path,#btn-cam.cam-bumper svg rect,#btn-cam.cam-bumper svg circle { stroke:#f0c040; }
 /* Fixed-size boxes — sized to fit max content (000 km/h / 00:00.00s / +00.00s) */
 #spd-wrap   { position:fixed; top:42px;  right:10px; z-index:10;
               width:134px; height:34px; overflow:hidden;
@@ -100,8 +106,9 @@ input[type=range]::-moz-range-thumb { width:22px; height:22px; border-radius:50%
 #minimap { width:75px; height:100px; }
 #best-display { top:110px; left:8px; font-size:.58rem; }
 #best-display b { font-size:.85rem; }
-#options-wrap { top:6px; right:8px; }
+#options-wrap { top:6px; right:8px; gap:5px; }
 #btn-options { font-size:.58rem; padding:4px 10px; }
+#btn-cam { width:36px; height:26px; }
 #spd-wrap   { top:26px; right:8px; width:100px; height:26px; }
 #time-wrap  { top:54px; right:8px; width:110px; height:22px; }
 #delta-wrap { top:78px; right:8px; width:96px;  height:18px; }
@@ -933,7 +940,7 @@ window.onunhandledrejection=function(e){
 <div id="minimap-wrap"><canvas id="minimap"></canvas></div>
 
 <div id="best-display">BEST <b id="h-best">--</b></div>
-<div id="options-wrap"><button id="btn-options">OPTIONS</button></div>
+<div id="options-wrap"><button id="btn-cam" title="Camera mode"><svg width="16" height="11" viewBox="0 0 16 11" fill="none" xmlns="http://www.w3.org/2000/svg"><rect x="0.75" y="2.75" width="10.5" height="7.5" rx="1.25" stroke="white" stroke-width="1.5" fill="none"/><path d="M11.5 5.5L15 3.5V8.5L11.5 6.5" stroke="white" stroke-width="1.5" stroke-linejoin="round" fill="none"/><circle cx="5.5" cy="6.5" r="1.5" stroke="white" stroke-width="1.2" fill="none"/><rect x="4" y="1" width="4" height="2" rx="0.75" stroke="white" stroke-width="1.2" fill="none"/></svg><span id="cam-mode-letter">C</span></button><button id="btn-options">OPTIONS</button></div>
 <button id="btn-pre-settings">SETTINGS</button>
 <div id="tools-island"><div id="tools-island-inner"><div class="tools-row"><button class="tool-btn" id="tool-minus">−</button><button class="tool-btn" id="tool-plus">+</button><button class="tool-btn" id="tool-done">✓</button><button class="tool-btn" id="tool-exit">✕</button></div><button id="tool-reset">↺ RESET ALL</button></div></div>
 <div id="spd-wrap"><div id="spd-big">0 <span id="spd-unit">km/h</span></div></div>
@@ -1000,7 +1007,7 @@ window.onunhandledrejection=function(e){
     <button id="btn-customize" style="width:100%;font-family:'Courier New',monospace;font-size:.7rem;letter-spacing:.12em;padding:10px;border-radius:8px;cursor:pointer;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.15);color:#aaa;">🎨 CUSTOMIZE HUD</button>
   </div>
   <div class="opt-row">
-    <button id="btn-respawn-manual" style="width:100%;font-family:'Courier New',monospace;font-size:.7rem;letter-spacing:.12em;padding:10px;border-radius:8px;cursor:pointer;background:rgba(255,80,80,.12);border:1px solid rgba(255,80,80,.35);color:#ff6666;">↺ RESPAWN</button>
+    <button id="btn-respawn-manual" style="width:100%;font-family:'Courier New',monospace;font-size:.7rem;letter-spacing:.12em;padding:10px;border-radius:8px;cursor:pointer;background:rgba(255,80,80,.12);border:1px solid rgba(255,80,80,.35);color:#ff6666;">↺ BACK TO STARTING LINE</button>
   </div>
   <div class="opt-row">
     <button id="btn-end-session" style="width:100%;font-family:'Courier New',monospace;font-size:.7rem;letter-spacing:.12em;padding:10px;border-radius:8px;cursor:pointer;background:rgba(240,192,64,.08);border:1px solid rgba(240,192,64,.25);color:#f0c040;">⏹ END SESSION</button>
@@ -1029,6 +1036,9 @@ window.onunhandledrejection=function(e){
   </div>
   <div class="opt-row">
     <button id="btn-ghost-action" style="width:100%;font-family:'Courier New',monospace;font-size:.7rem;letter-spacing:.12em;padding:10px;border-radius:8px;cursor:pointer;background:rgba(240,192,64,.12);border:1px solid rgba(240,192,64,.35);color:#f0c040;">💾 SAVE BEST LAP GHOST</button>
+  </div>
+  <div class="opt-row" id="btn-activate-multi-row" style="display:none;">
+    <button id="btn-activate-multi" style="width:100%;font-family:'Courier New',monospace;font-size:.7rem;letter-spacing:.12em;padding:10px;border-radius:8px;cursor:pointer;background:rgba(180,120,255,.12);border:1px solid rgba(180,120,255,.45);color:#cc88ff;">▶ ACTIVATE MULTI GHOST</button>
   </div>
   <div class="opt-row">
     <div style="display:flex;align-items:center;justify-content:space-between;">
@@ -2773,11 +2783,64 @@ function physics(dt){
   car.atSF = nearSF && car.speed > 0.5;
 }
 
+// ── CAMERA MODE ── 'chase' | 'hood' | 'bumper'
+let camMode = 'chase';
+const _camBtn = document.getElementById('btn-cam');
+const _camLetter = document.getElementById('cam-mode-letter');
+const _CAM_LETTERS = { chase: 'C', hood: 'H', bumper: 'B' };
+const _CAM_NEXT    = { chase: 'hood', hood: 'bumper', bumper: 'chase' };
+
+_camBtn.addEventListener('click', () => {
+  camMode = _CAM_NEXT[camMode];
+  _camLetter.textContent = _CAM_LETTERS[camMode];
+  _camBtn.className = camMode === 'hood' ? 'cam-hood' : camMode === 'bumper' ? 'cam-bumper' : '';
+  camera.fov = camMode === 'hood' ? 120 : camMode === 'bumper' ? 72 : 60;
+  camera.updateProjectionMatrix();
+  wsMesh.material.opacity = camMode === 'hood' ? 0 : 0.75;
+  cabinMesh.material.opacity = camMode === 'hood' ? 0 : 1;
+  cabinMesh.material.transparent = true;
+  const svgEls = _camBtn.querySelectorAll('path, rect, circle');
+  svgEls.forEach(el => { el.style.stroke = 'currentColor'; });
+  SND.playUIClick();
+});
+
 function updateCamera(){
   const csh=Math.cos(car.heading),snh=Math.sin(car.heading);
-  const camH=S.ch-suspBounce*0.8+suspPitch*1.2;
-  camera.position.set(car.px-snh*S.cd,camH,car.pz-csh*S.cd);
-  camera.lookAt(car.px,0.65-suspPitch*1.5,car.pz);
+  const fwdX = snh, fwdZ = csh; // forward direction vector
+
+  if(camMode === 'hood'){
+    // Height 1.41 — fixed per user spec. Strong suspension coupling for brake/accel feel.
+    const hoodH = 1.41 + suspBounce * 0.55 + suspPitch * 0.70;
+    camera.position.set(
+      car.px + fwdX * 1.3,
+      hoodH,
+      car.pz + fwdZ * 1.3
+    );
+    // Look target pitches with suspension — nose dives on brake, lifts on accel
+    camera.lookAt(
+      car.px + fwdX * 9,
+      hoodH - 0.45 + suspPitch * 1.4,
+      car.pz + fwdZ * 9
+    );
+  } else if(camMode === 'bumper'){
+    // Front bumper cam: higher so road ahead is well visible
+    const bumpH = 0.98 + suspBounce * 0.2 + suspPitch * 0.2;
+    camera.position.set(
+      car.px + fwdX * 1.9,
+      bumpH,
+      car.pz + fwdZ * 1.9
+    );
+    camera.lookAt(
+      car.px + fwdX * 28,
+      bumpH - 0.38 + suspPitch * 0.5,
+      car.pz + fwdZ * 28
+    );
+  } else {
+    // Default chase cam
+    const camH=S.ch-suspBounce*0.8+suspPitch*1.2;
+    camera.position.set(car.px-snh*S.cd,camH,car.pz-csh*S.cd);
+    camera.lookAt(car.px,0.65-suspPitch*1.5,car.pz);
+  }
 }
 
 let prevSpeed=0,suspPitch=0,suspBounce=0,smoothAccel=0;
@@ -3494,21 +3557,20 @@ const SND = (()=>{
     _spdSmooth+=(Math.abs(spd)-_spdSmooth)*0.07;
 
     if(isPaused){
-      master.gain.setTargetAtTime(0,now,0.12);
-      if(_brakeHissGain)    _brakeHissGain.gain.setTargetAtTime(0,now,0.08);
-      if(_brakeLockGain)    _brakeLockGain.gain.setTargetAtTime(0,now,0.08);
-      if(_brkBurbleGain)    _brkBurbleGain.gain.setTargetAtTime(0,now,0.08);
-      if(_brkBurbleNoiseGain) _brkBurbleNoiseGain.gain.setTargetAtTime(0,now,0.08);
-      if(_brakeResonGain)   _brakeResonGain.gain.setTargetAtTime(0,now,0.08);
-      if(_brakeResonNoiseGain) _brakeResonNoiseGain.gain.setTargetAtTime(0,now,0.08);
-      if(_hbScrubGain)      _hbScrubGain.gain.setTargetAtTime(0,now,0.08);
-      if(_tyreSquealGain)   _tyreSquealGain.gain.setTargetAtTime(0,now,0.08);
-      if(_wheelspinGain)    _wheelspinGain.gain.setTargetAtTime(0,now,0.08);
-      if(_driftSquealGain)  _driftSquealGain.gain.setTargetAtTime(0,now,0.08);
+      // Instant cut — cancel any pending ramps then zero immediately
+      const _cut = (g) => { if(g){ g.gain.cancelScheduledValues(now); g.gain.setValueAtTime(0,now); } };
+      _cut(master);
+      _cut(_brakeHissGain); _cut(_brakeLockGain);
+      _cut(_brkBurbleGain); _cut(_brkBurbleNoiseGain);
+      _cut(_brakeResonGain); _cut(_brakeResonNoiseGain);
+      _cut(_hbScrubGain); _cut(_tyreSquealGain);
+      _cut(_wheelspinGain); _cut(_driftSquealGain);
       _thrSmooth=0; return;
     }
     if(!preStart){
-      master.gain.setTargetAtTime(1,now,0.25);
+      // Ramp back up from 0 cleanly after the instant cut
+      if(master.gain.value < 0.01){ master.gain.setValueAtTime(0,now); }
+      master.gain.setTargetAtTime(0.68,now,0.18);
     }
     // during preStart (countdown): scheduled linearRamp from countdownFadeIn() runs freely
 
@@ -3578,8 +3640,8 @@ const SND = (()=>{
       if(master){
         master.gain.cancelScheduledValues(now);
         master.gain.setValueAtTime(master.gain.value, now);
-        master.gain.linearRampToValueAtTime(1.12, now + 0.035);
-        master.gain.linearRampToValueAtTime(1.0,  now + 0.12);
+        master.gain.linearRampToValueAtTime(0.94, now + 0.035);
+        master.gain.linearRampToValueAtTime(0.68,  now + 0.12);
       }
     }
 
@@ -3609,9 +3671,8 @@ const SND = (()=>{
     noiseBP.frequency.setTargetAtTime(fireHzEff*0.8,now,0.04);
     noiseGain.gain.setTargetAtTime(thrG*rpmN*0.55*_rndPhase*VOL.engine*VOL.harm,now,0.04);
 
-    // ── INTAKE HISS — VOL.exhaust controls the high-end exhaust breath ──
-    const intakeVol=Math.pow(thrG,2)*Math.pow(rpmN,1.5)*0.18*VOL.engine*VOL.exhaust;
-    intakeGain.gain.setTargetAtTime(intakeVol,now,0.05);
+    // ── INTAKE HISS — removed (was causing unwanted airy sound above 5800rpm) ──
+    intakeGain.gain.setTargetAtTime(0, now, 0.05);
 
     // ── RASP — dynamically adjusts saturation curve based on VOL.rasp slider ──
     if(satNode && _lastRasp !== VOL.rasp){
@@ -3717,8 +3778,8 @@ const SND = (()=>{
       // Brief master volume spike — the cut+bounce feel
       master.gain.cancelScheduledValues(now);
       master.gain.setValueAtTime(master.gain.value, now);
-      master.gain.linearRampToValueAtTime(0.75, now + 0.02);
-      master.gain.linearRampToValueAtTime(1.0,  now + 0.07);
+      master.gain.linearRampToValueAtTime(0.62, now + 0.02);
+      master.gain.linearRampToValueAtTime(0.68,  now + 0.07);
     }
     _revLimitWas = atRevLimit;
 
@@ -3839,7 +3900,7 @@ const SND = (()=>{
   }
 
   function setVol(ch,v){ VOL[ch]=v; }
-  function setMute(on){ _muted=on; if(master) master.gain.setTargetAtTime(on?0:1,ctx.currentTime,0.1); }
+  function setMute(on){ _muted=on; if(master) master.gain.setTargetAtTime(on?0:0.68,ctx.currentTime,0.1); }
   function resume(){ if(ctx&&ctx.state==='suspended') ctx.resume(); }
 
   // Called on START click — engine runs silently with high randomness (warmup feel)
@@ -3855,7 +3916,7 @@ const SND = (()=>{
   function startGo(){
     if(!_started) return;
     _warmupSettleStart=ctx.currentTime;
-    if(master) master.gain.setTargetAtTime(1,ctx.currentTime,0.35); // 0.35s fade-in
+    if(master) master.gain.setTargetAtTime(0.68,ctx.currentTime,0.35); // 0.35s fade-in
   }
 
   // Called inside update — settles randomness back to normal range after GO
@@ -3879,7 +3940,7 @@ const SND = (()=>{
     master.gain.cancelScheduledValues(now);
     // Read current value to avoid discontinuity click — ramp FROM where we are
     master.gain.setValueAtTime(0.0001, now);      // tiny non-zero floor (exponential needs >0)
-    master.gain.exponentialRampToValueAtTime(1, now+dur); // exponential = smoother perceptually
+    master.gain.exponentialRampToValueAtTime(0.68, now+dur); // exponential = smoother perceptually
   }
 
   function playUIClick(){
@@ -3938,23 +3999,30 @@ const SND = (()=>{
 // Volume fades with distance from player.
 // ══════════════════════════════════════════════════════════════════
 const GHOST_SND = (()=>{
-  const MAX_DIST = 55;   // world units — fully silent beyond this
-  const MIN_DIST = 3;    // world units — full volume within this
-  const MAX_VOL  = 0.28; // quieter than player so it doesn't compete
+  const MAX_DIST = 55;
+  const MIN_DIST = 3;
+  const MAX_VOL  = 0.65;
 
-  // One audio chain per ghost slot (max 4 — 1 single + 3 multi)
   const SLOTS = 4;
   const slots = [];
-
   let _ctx = null;
 
   function _makeSlot(){
-    // Each slot: 2 detuned saws → LP filter → gain → master out
+    // Chain: oscs+noise → sat → lp(RPM) → distLP(distance) → panner → master gain → out
     const master = _ctx.createGain(); master.gain.value = 0;
     master.connect(_ctx.destination);
 
+    // Stereo panner — positions ghost left/right in headphones based on world angle
+    const panner = _ctx.createStereoPanner ? _ctx.createStereoPanner() : null;
+    if(panner){ panner.pan.value = 0; panner.connect(master); }
+
+    // Distance LP: air absorption — bright close, muffled far
+    const distLP = _ctx.createBiquadFilter(); distLP.type = 'lowpass';
+    distLP.frequency.value = 3500; distLP.Q.value = 0.5;
+    distLP.connect(panner || master);
+
     const lp = _ctx.createBiquadFilter(); lp.type = 'lowpass'; lp.frequency.value = 800; lp.Q.value = 0.7;
-    lp.connect(master);
+    lp.connect(distLP);
 
     const sat = _ctx.createWaveShaper();
     const c = new Float32Array(256);
@@ -3971,7 +4039,6 @@ const GHOST_SND = (()=>{
       oscs.push(o); gains.push(g);
     });
 
-    // Noise layer for combustion texture
     const bufDur = 2, buf = _ctx.createBuffer(1, _ctx.sampleRate*bufDur, _ctx.sampleRate);
     const d = buf.getChannelData(0); let b0=0,b1=0,b2=0;
     for(let i=0;i<d.length;i++){
@@ -3984,7 +4051,7 @@ const GHOST_SND = (()=>{
     const ng = _ctx.createGain(); ng.gain.value=0;
     noise.connect(nbp); nbp.connect(ng); ng.connect(sat); noise.start();
 
-    return { master, lp, oscs, gains, ng, nbp, active: false, ghostId: null };
+    return { master, panner, distLP, lp, oscs, gains, ng, nbp, active: false, ghostId: null };
   }
 
   function init(ctx){
@@ -3993,41 +4060,63 @@ const GHOST_SND = (()=>{
     for(let i=0;i<SLOTS;i++) slots.push(_makeSlot());
   }
 
-  function _distVol(gx, gz){
+  function _spatial(gx, gz){
     const dx = gx - car.px, dz = gz - car.pz;
     const dist = Math.sqrt(dx*dx + dz*dz);
     const volMul = (typeof _ghostVolMul !== 'undefined') ? _ghostVolMul : 1.0;
-    return Math.max(0, Math.min(1, 1 - (dist - MIN_DIST) / (MAX_DIST - MIN_DIST))) * MAX_VOL * volMul;
+    const vol = Math.max(0, Math.min(1, 1-(dist-MIN_DIST)/(MAX_DIST-MIN_DIST))) * MAX_VOL * volMul;
+
+    // Air absorption: 3500Hz close → 380Hz far (exponential)
+    const df = Math.min(1, Math.max(0, (dist-6)/(MAX_DIST-6)));
+    const lpFreq = 3500 * Math.pow(0.109, df);
+
+    // Stereo pan: project ghost onto camera right vector (cos h, -sin h)
+    const ch = Math.cos(car.heading), sh = Math.sin(car.heading);
+    const dotRight = dx * ch - dz * sh;
+    const pan = Math.max(-1, Math.min(1, dotRight / Math.max(dist, 1)))
+              * 0.75
+              * Math.min(1, dist / 10); // no pan when very close (alongside)
+
+    return { vol, lpFreq, pan };
   }
 
   function updateSlot(slotIdx, rpm, spd, vx, gx, gz, active){
     if(!_ctx || slotIdx >= slots.length) return;
     const s = slots[slotIdx];
     const now = _ctx.currentTime;
-    const vol = active ? _distVol(gx, gz) : 0;
-    s.master.gain.setTargetAtTime(vol, now, 0.08);
-    if(!active || vol < 0.001) return;
 
-    const rpmN = Math.max(0.04, Math.min(1, (rpm - 900) / 7100));
-    const fireHz = Math.max(40, rpm / 15);
-    const oscVol = (0.3 + rpmN * 0.55) * 0.7;
+    if(!active){
+      s.master.gain.cancelScheduledValues(now);
+      s.master.gain.setValueAtTime(0, now);
+      return;
+    }
+
+    const { vol, lpFreq, pan } = _spatial(gx, gz);
+    s.master.gain.setTargetAtTime(vol, now, 0.08);
+    if(s.panner) s.panner.pan.setTargetAtTime(pan, now, 0.04);
+    s.distLP.frequency.setTargetAtTime(lpFreq, now, 0.05);
+    if(vol < 0.002) return;
+
+    const rpmN = Math.max(0.04, Math.min(1, (rpm-900)/7100));
+    const fireHz = Math.max(40, rpm/15);
+    const oscVol = (0.3 + rpmN*0.55)*0.7;
 
     s.oscs.forEach((o,i)=>{
-      o.frequency.setTargetAtTime(fireHz * 0.5, now, 0.03);
+      o.frequency.setTargetAtTime(fireHz*0.5, now, 0.03);
       s.gains[i].gain.setTargetAtTime(oscVol, now, 0.03);
     });
-
-    // LP opens with RPM
-    s.lp.frequency.setTargetAtTime(200 + rpmN * 1800, now, 0.05);
-
-    // Noise tracks RPM
-    s.nbp.frequency.setTargetAtTime(fireHz * 0.8, now, 0.04);
-    s.ng.gain.setTargetAtTime(rpmN * 0.35, now, 0.04);
+    s.lp.frequency.setTargetAtTime(200 + rpmN*1800, now, 0.05);
+    s.nbp.frequency.setTargetAtTime(fireHz*0.8, now, 0.04);
+    s.ng.gain.setTargetAtTime(rpmN*0.35, now, 0.04);
   }
 
   function stopAll(){
     if(!_ctx) return;
-    slots.forEach(s=> s.master.gain.setTargetAtTime(0, _ctx.currentTime, 0.15));
+    const now = _ctx.currentTime;
+    slots.forEach(s=>{
+      s.master.gain.cancelScheduledValues(now);
+      s.master.gain.setValueAtTime(0, now);
+    });
   }
 
   return { init, updateSlot, stopAll };
@@ -4048,6 +4137,7 @@ requestAnimationFrame(loop);
   renderer.render(scene,camera);
   if(isPaused||preStart){
     SND.update(car.rpm,car.vz,car.vx,preStart?0.08:0,0,0,false,false,false,true,false,null,true,preStart);
+    GHOST_SND.stopAll();
     lastTime=ts; _wasPaused=true; return;
   }
   // First frame after unpause: dt=0 so no jerk/shake
@@ -4127,7 +4217,7 @@ document.addEventListener('visibilitychange', () => {
 
 // ── UI CLICK SOUND — fires on any menu/options button ──
 const _UI_CLICK_IDS = new Set([
-  'btn-options','btn-close','btn-close-sens','btn-close-sens-top',
+  'btn-options','btn-cam','btn-close','btn-close-sens','btn-close-sens-top',
   'btn-close-ctrl','btn-close-sound','btn-close-sound-top','btn-close-lb','btn-close-log','btn-close-log-top','btn-copy-log','btn-clear-log',
   'btn-close-name','btn-close-track-picker',
   'btn-save-name','btn-start','btn-customize','btn-new-session','btn-session-back',
@@ -4690,6 +4780,7 @@ let ghostBest=[];
 let ghostPlay=[];
 let ghostActive=false;
 let ghostLapT=0;
+let _ghostFrameLastTs=0;
 
 // Multi-ghost state
 let multiSelectedIds = new Set();   // ids of ghosts selected for multi mode
@@ -4743,6 +4834,8 @@ function ghostOnLapCross(isNewBest){
     saveSavedGhosts(obj);
   }
   ghostRec = [];
+  // Apply any pending ghost config change queued while mid-lap
+  _applyPendingGhost();
   if(ghostMode === 'off'){ ghostGroup.visible=false; return; }
   if(ghostMode === 'realtime'){
     ghostPlay = ghostBest.slice();
@@ -4785,9 +4878,33 @@ function _interpGhostGroup(group, frames, elapsed){
   return {px,pz};
 }
 
+// Reusable frustum for ghost POV culling — updated once per frame in ghostFrame
+const _ghostFrustum = new THREE.Frustum();
+const _ghostProjMat = new THREE.Matrix4();
+const _ghostSphere  = new THREE.Sphere();
+
 // ── Called every render frame ──
 function ghostFrame(){
+  // Don't advance ghost time while paused — menu open means real time keeps
+  // ticking but the ghost lap timer should freeze so ghosts don't run ahead
+  const isPausedNow = optPanel.classList.contains('open') ||
+    document.getElementById('cust-screen').classList.contains('active') ||
+    document.getElementById('session-screen').classList.contains('open') ||
+    document.getElementById('save-ghost-modal').classList.contains('open');
+  const _gfNow = performance.now();
+  const _gfDt = (_ghostFrameLastTs > 0) ? (_gfNow - _ghostFrameLastTs) / 1000 : 0;
+  _ghostFrameLastTs = _gfNow;
+  if(isPausedNow){
+    // Advance lap reference times so elapsed stays frozen while menu is open
+    ghostLapT += _gfDt;
+    _multiGhosts.forEach(mg=>{ mg.lapT += _gfDt; });
+  }
+
   const elapsed = performance.now()/1000 - ghostLapT;
+
+  // Update frustum once per frame for POV culling
+  _ghostProjMat.multiplyMatrices(camera.projectionMatrix, camera.matrixWorldInverse);
+  _ghostFrustum.setFromProjectionMatrix(_ghostProjMat);
 
   // Single ghost (realtime / loaded)
   if(ghostMode==='realtime'||ghostMode==='loaded'){
@@ -4800,8 +4917,13 @@ function ghostFrame(){
       ghostActive=false; document.getElementById('ghost-label').style.display='none';
       GHOST_SND.updateSlot(0, 900, 0, 0, 0, 0, false); return;
     }
-    _updateGhostLabel(pos.px, pos.pz, document.getElementById('ghost-label'), ghostLapTime||ghostName);
-    // Audio — interpolate sound values same as position
+    // Only update label when ghost is in FOV
+    _ghostSphere.set(ghostGroup.position, 5);
+    if(_ghostFrustum.intersectsSphere(_ghostSphere)){
+      _updateGhostLabel(pos.px, pos.pz, document.getElementById('ghost-label'), ghostLapTime||ghostName);
+    } else {
+      document.getElementById('ghost-label').style.display='none';
+    }
     const _gf = _ghostInterpSound(ghostPlay, elapsed);
     GHOST_SND.updateSlot(0, _gf.rpm, _gf.spd, _gf.vx, pos.px, pos.pz, true);
   } else {
@@ -4822,7 +4944,15 @@ function ghostFrame(){
         mg.active=false; if(mg.lapLabel) mg.lapLabel.style.display='none';
         GHOST_SND.updateSlot(ci+1, 900, 0, 0, 0, 0, false); return;
       }
-      if(mg.lapLabel) _updateGhostLabel(pos.px, pos.pz, mg.lapLabel, mg.lapTime);
+      // Label only when in FOV
+      if(mg.lapLabel){
+        _ghostSphere.set(mg.group.position, 5);
+        if(_ghostFrustum.intersectsSphere(_ghostSphere)){
+          _updateGhostLabel(pos.px, pos.pz, mg.lapLabel, mg.lapTime);
+        } else {
+          mg.lapLabel.style.display='none';
+        }
+      }
       const _gf = _ghostInterpSound(mg.frames, me);
       GHOST_SND.updateSlot(ci+1, _gf.rpm, _gf.spd, _gf.vx, pos.px, pos.pz, true);
     });
@@ -4856,8 +4986,14 @@ function _updateGhostLabel(px,pz,lbl,text){
 }
 
 // ── Mode buttons ──
+let _pendingGhostMode = null;
+let _pendingGhostId   = null;
+let _pendingMultiIds  = null;
+function _applyPendingGhost(){ /* no-op — immediate mode, kept for SF hook compat */ }
+
 document.getElementById('btn-ghost-realtime').addEventListener('click',()=>{
-  ghostMode='realtime'; ghostPlay=ghostBest.slice(); selectedGhostId=null; ghostName='BEST LAP'; ghostLapTime=car.best<Infinity?car.best.toFixed(2)+'s':'';
+  ghostMode='realtime'; ghostPlay=ghostBest.slice(); selectedGhostId=null; ghostName='BEST LAP';
+  ghostLapTime=car.best<Infinity?car.best.toFixed(2)+'s':'';
   _updateGhostPlate(ghostGroup, playerName);
   _clearMultiGhosts();
   document.getElementById('ghost-subpanel').classList.remove('open');
@@ -4882,13 +5018,16 @@ document.getElementById('btn-ghost-multi').addEventListener('click',()=>{
 
 function updateGhostAction(){
   const btn = document.getElementById('btn-ghost-action');
-  if(ghostMode==='loaded'){
-    btn.textContent='▶ LOAD GHOST'; btn.style.background='rgba(48,224,96,.12)'; btn.style.border='1px solid rgba(48,224,96,.35)'; btn.style.color='#30e060';
-  } else if(ghostMode==='multi'){
-    btn.textContent='▶ ACTIVATE MULTI'; btn.style.background='rgba(180,120,255,.12)'; btn.style.border='1px solid rgba(180,120,255,.35)'; btn.style.color='#cc88ff';
-  } else {
-    btn.textContent='💾 SAVE BEST LAP GHOST'; btn.style.background='rgba(240,192,64,.12)'; btn.style.border='1px solid rgba(240,192,64,.35)'; btn.style.color='#f0c040';
-  }
+  const multiRow = document.getElementById('btn-activate-multi-row');
+  const activeMode = _pendingGhostMode || ghostMode;
+  // Save button is always gold — always visible for saving
+  btn.textContent='💾 SAVE BEST LAP GHOST';
+  btn.style.background='rgba(240,192,64,.12)';
+  btn.style.border='1px solid rgba(240,192,64,.35)';
+  btn.style.color='#f0c040';
+  // Show ACTIVATE MULTI button only when multi tab/list is open
+  const listHasMulti = !!document.querySelector('.ghost-multi-entry');
+  if(multiRow) multiRow.style.display = listHasMulti ? '' : 'none';
 }
 
 function updateGhostUI(){
@@ -5004,21 +5143,8 @@ function _updateGhostPlate(group, text){
 }
 
 document.getElementById('btn-ghost-action').addEventListener('click',()=>{
-  if(ghostMode==='loaded'){
-    if(!selectedGhostId||ghostPlay.length<2){ ghostMode='realtime'; ghostPlay=ghostBest.slice(); document.getElementById('ghost-subpanel').classList.remove('open'); _closeOptionsPanel(); updateGhostUI(); return; }
-    ghostActive=false; ghostGroup.visible=false;
-    // Update plate to show the saved ghost's player name
-    const _sg = loadSavedGhosts()[selectedGhostId];
-    _updateGhostPlate(ghostGroup, _sg ? (_sg.playerName || _sg.name || '') : '');
-    document.getElementById('ghost-subpanel').classList.remove('open'); _closeOptionsPanel(); updateGhostUI();
-  } else if(ghostMode==='multi'){
-    if(multiSelectedIds.size===0){ document.getElementById('ghost-status-lbl').textContent='Select at least one ghost first'; return; }
-    _buildMultiGhosts();
-    document.getElementById('ghost-subpanel').classList.remove('open'); _closeOptionsPanel(); updateGhostUI();
-  } else {
-    if(ghostBest.length<10){ document.getElementById('ghost-status-lbl').textContent='No best lap recorded yet!'; return; }
-    openSaveGhostModal(null);
-  }
+  if(ghostBest.length<10){ document.getElementById('ghost-status-lbl').textContent='No best lap recorded yet!'; return; }
+  openSaveGhostModal(null);
 });
 
 function openSaveGhostModal(onDiscard, fromEndSession){
@@ -5281,6 +5407,24 @@ function doRespawn(){
   _clearMarks();
 }
 
+// Back to start/finish line — keeps lap count and timer running, just teleports position
+function doBackToStartLine(){
+  const sf = CENTRE[0];
+  const t  = tangentAt(0);
+  const _sfB = 8; // metres behind SF line
+  car.px = sf.x - t.tx * _sfB;
+  car.pz = sf.y - t.tz * _sfB;
+  car.heading = Math.atan2(t.tx, t.tz);
+  car.speed=0; car.vz=0; car.vx=0; car.av=0; car.steer=0;
+  car.oversteer=false; car.understeer=false; car.spinning=false; car.gearJustShifted=null;
+  car.barrierHit=false; car._sfSmooth=0; car._hbGrip=1.0; car._dftWasOn=false; car._dftLockedVz=0; car._dftGripTimer=0; setDrift(false);
+  showRespawnPrompt(false);
+  _clearMarks();
+  // Mark lap dirty so this lap doesn't count as a clean time
+  car.lapDirty=true;
+  addPenalty(0, 'BACK TO START');
+}
+
 document.getElementById('respawn-btn').addEventListener('click', doRespawn);
 document.getElementById('respawn-btn').addEventListener('touchstart', e=>{
   e.preventDefault(); doRespawn();
@@ -5346,13 +5490,11 @@ const _origRenderLB = renderLeaderboard;
 // (renderLeaderboard already defined — calling switchLBTab will trigger it)
 
 // ══════════════════════════════════════════
-// RESPAWN MANUAL BUTTON (in General tab)
+// BACK TO START LINE BUTTON (in General tab)
 // ══════════════════════════════════════════
 document.getElementById('btn-respawn-manual').addEventListener('click',()=>{
-  // Use last known closest track index
-  car.respawnIdx = closestTrackIdx(car.px, car.pz);
   _closeOptionsPanel();
-  doRespawn();
+  doBackToStartLine();
 });
 
 // ══════════════════════════════════════════
@@ -5464,6 +5606,14 @@ document.getElementById('btn-autosave-toggle').addEventListener('click',()=>{
   }
 });
 
+
+// ── ACTIVATE MULTI button ──
+document.getElementById('btn-activate-multi').addEventListener('click',()=>{
+  if(multiSelectedIds.size===0){ document.getElementById('ghost-status-lbl').textContent='Select at least one ghost first'; return; }
+  _buildMultiGhosts();
+  document.getElementById('ghost-subpanel').classList.remove('open'); _closeOptionsPanel();
+  updateGhostUI();
+});
 
 // ══════════════════════════════════════════
 // GAME LOGGER SYSTEM
