@@ -356,44 +356,33 @@ function buildTrack(){
   sfp.rotation.x=-Math.PI/2; sfp.rotation.z=Math.atan2(st.tx,st.tz);
   sfp.position.set(sf.x,0.03,sf.y); addTrackMesh(sfp);
 
-  // ── BARRIERS — outer + inner walls both visible ────────────────────
+  // ── BARRIERS (only for oval — original single-sided style) ────────
   if(cfg.barriers !== false){
-    const BH=1.1, TR=0.38, BF=1.9;
-    function buildBarrierWall(sideSign, offset){
-      const bv=[],bi=[],bu=[],bc=[];let bvi=0;
-      for(let i=0;i<N_PTS;i++){
-        const i1=(i+1)%N_PTS,c0=CENTRE[i],c1=CENTRE[i1];
-        const t0=tangentAt(i),t1=tangentAt(i1);
-        const nx0=-t0.tz*sideSign,nz0=t0.tx*sideSign;
-        const nx1=-t1.tz*sideSign,nz1=t1.tx*sideSign;
-        const sl2=Math.sqrt((c1.x-c0.x)**2+(c1.y-c0.y)**2);
-        const ph0=i*0.55,ph1=ph0+sl2*BF;
-        for(let s=0;s<2;s++){
-          const c=s===0?c0:c1,nx=s===0?nx0:nx1,nz=s===0?nz0:nz1,ph=s===0?ph0:ph1;
-          const bump=Math.abs(Math.sin(ph*Math.PI))*TR*0.35;
-          const bx=c.x+nx*offset,bz=c.y+nz*offset;
-          const tr2=Math.floor(ph/1.0)%2,rc=tr2===0?[0.10,0.10,0.12]:[0.20,0.18,0.16];
-          bv.push(bx,0,bz); bu.push(s,0); bc.push(...rc);
-          bv.push(bx+nx*bump*0.4,BH+bump,bz+nz*bump*0.4); bu.push(s,1); bc.push(...rc);
-        }
-        bi.push(bvi,bvi+2,bvi+1, bvi+1,bvi+2,bvi+3); bvi+=4;
+    const BOFF=TW/2+TW, BH=1.1, TR=0.38, BF=1.9;
+    const bv=[],bi=[],bu=[],bc=[];let bvi=0;
+    for(let i=0;i<N_PTS;i++){
+      const i1=(i+1)%N_PTS,c0=CENTRE[i],c1=CENTRE[i1];
+      const t0=tangentAt(i),t1=tangentAt(i1);
+      const nx0=-t0.tz,nz0=t0.tx,nx1=-t1.tz,nz1=t1.tx;
+      const sl2=Math.sqrt((c1.x-c0.x)**2+(c1.y-c0.y)**2);
+      const ph0=i*0.55,ph1=ph0+sl2*BF;
+      for(let s=0;s<2;s++){
+        const c=s===0?c0:c1,nx=s===0?nx0:nx1,nz=s===0?nz0:nz1,ph=s===0?ph0:ph1;
+        const bump=Math.abs(Math.sin(ph*Math.PI))*TR*0.35;
+        const bx=c.x+nx*BOFF,bz=c.y+nz*BOFF;
+        const tr2=Math.floor(ph/1.0)%2,rc=tr2===0?[0.08,0.08,0.08]:[0.14,0.12,0.10];
+        bv.push(bx,0,bz); bu.push(s,0); bc.push(...rc);
+        bv.push(bx+nx*bump*0.4,BH+bump,bz+nz*bump*0.4); bu.push(s,1); bc.push(...rc);
       }
-      const bg=new THREE.BufferGeometry();
-      bg.setAttribute('position',new THREE.Float32BufferAttribute(bv,3));
-      bg.setAttribute('color',new THREE.Float32BufferAttribute(bc,3));
-      bg.setAttribute('uv',new THREE.Float32BufferAttribute(bu,2));
-      bg.setIndex(bi); bg.computeVertexNormals();
-      const bm=new THREE.Mesh(bg,new THREE.MeshLambertMaterial({vertexColors:true,side:THREE.DoubleSide}));
-      bm.castShadow=true; bm.receiveShadow=true; addTrackMesh(bm);
+      bi.push(bvi,bvi+2,bvi+1, bvi+1,bvi+2,bvi+3); bvi+=4;
     }
-    const OUTER = TW/2+TW;
-    const INNER = TW/2+1.0;
-    // Outer walls — normal points away from track centre
-    buildBarrierWall( 1, OUTER);
-    buildBarrierWall(-1, OUTER);
-    // Inner walls — same offset but mirrored sideSign so they face inward
-    buildBarrierWall(-1, INNER);
-    buildBarrierWall( 1, INNER);
+    const bg2=new THREE.BufferGeometry();
+    bg2.setAttribute('position',new THREE.Float32BufferAttribute(bv,3));
+    bg2.setAttribute('color',new THREE.Float32BufferAttribute(bc,3));
+    bg2.setAttribute('uv',new THREE.Float32BufferAttribute(bu,2));
+    bg2.setIndex(bi); bg2.computeVertexNormals();
+    const bm=new THREE.Mesh(bg2,new THREE.MeshLambertMaterial({vertexColors:true,side:THREE.DoubleSide}));
+    bm.castShadow=true; bm.receiveShadow=true; addTrackMesh(bm);
   }
 }
 checkpoint('buildTrack');
@@ -1331,51 +1320,14 @@ function physics(dt){
     const side=Math.sign(signedDist);
     car.px=cp.x+rnx*side*(barrierDist-0.6);
     car.pz=cp.y+rnz*side*(barrierDist-0.6);
-
-    // ── CRASH PHYSICS — concrete wall, real restitution 0.05–0.12 ──────
-    const wnx=rnx*side, wnz=rnz*side;
-    const cH2=Math.cos(car.heading), sH2=Math.sin(car.heading);
-    const wvx=sH2*car.vz+cH2*car.vx;
-    const wvz=cH2*car.vz-sH2*car.vx;
-    const vNorm=wvx*wnx+wvz*wnz;
-    const vTanX=wvx-vNorm*wnx;
-    const vTanZ=wvz-vNorm*wnz;
-    const impactSpeed=Math.abs(vNorm);
-    const tanSpeed=Math.sqrt(vTanX*vTanX+vTanZ*vTanZ);
-
-    // Real concrete: almost no bounce. High speed = more energy absorbed (crumple)
-    const REST=cl(0.08-impactSpeed*0.002, 0.02, 0.10);
-    // Friction along wall — glancing hits keep most tangential speed
-    const FRIC=cl(0.82-impactSpeed*0.008, 0.55, 0.82);
-
-    const newWvx=-vNorm*REST*wnx+vTanX*FRIC;
-    const newWvz=-vNorm*REST*wnz+vTanZ*FRIC;
-    car.vz=newWvx*sH2+newWvz*cH2;
-    car.vx=newWvx*cH2-newWvz*sH2;
-    car.speed=car.vz;
-
-    // Spin from off-centre hit
-    const crossSign=Math.sign(wvx*wnz-wvz*wnx);
-    car.av+=cl(tanSpeed*0.028*crossSign*(impactSpeed/15),-3.0,3.0);
-
-    // Hard head-on: kill remaining forward speed, small heading jolt
-    if(impactSpeed>10){
-      car.vz*=0.30;
-      car.heading+=crossSign*0.03*cl(impactSpeed/25,0,1);
-    }
-
-    car.vz=cl(car.vz,-60,60);
-    car.vx=cl(car.vx,-30,30);
-    car.av=cl(car.av,-3.5,3.5);
-
+    car.speed=0;car.vz=0;car.vx=0;car.av=0;
     if(!car.barrierHit){
       car.barrierHit=true; car.barrierSide=ci; car.lapDirty=true;
       addPenalty(5.0,'+5.0s BARRIER');
+      // Store respawn point — track centre at impact index, facing track direction
       car.respawnIdx=ci;
-      car._lastImpactSpeed=impactSpeed;
-      car._lastImpactTanSpeed=tanSpeed;
-      if(impactSpeed>2.5) showRespawnPrompt(true);
-      setDrift(false);
+      showRespawnPrompt(true);
+      setDrift(false); // cancel drift on crash
     }
   } else {car.barrierHit=false;}
 
