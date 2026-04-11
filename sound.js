@@ -631,13 +631,75 @@ const SND = (()=>{
       _driftWasOff = !(driftIntensity > 0.2);
     }
 
-    if(barrierHit&&ctx.currentTime-_lastCrash>0.3){
+    if(barrierHit&&ctx.currentTime-_lastCrash>0.25){
       _lastCrash=ctx.currentTime;
-      const lp2=ctx.createBiquadFilter(); lp2.type='lowpass'; lp2.frequency.value=600;
-      const g2=ctx.createGain(); g2.gain.setValueAtTime(VOL.crash*0.8,now);
-      g2.gain.exponentialRampToValueAtTime(0.001,now+0.35); g2.connect(master);
-      const ns2=ctx.createBufferSource(); ns2.buffer=mkBuf(0.5);
-      ns2.connect(lp2); lp2.connect(g2); ns2.start(now); ns2.stop(now+0.35);
+      const impSpd=(typeof car!=='undefined'&&car._lastImpactSpeed)?car._lastImpactSpeed:12;
+      const tanSpd=(typeof car!=='undefined'&&car._lastImpactTanSpeed)?car._lastImpactTanSpeed:8;
+      const impNorm=Math.min(impSpd/25,1.0);
+      const tanNorm=Math.min(tanSpd/20,1.0);
+      const vol=VOL.crash;
+
+      // Layer 1: Concrete thud — deep low-frequency chassis shock
+      const dur1=0.25+impNorm*0.35;
+      const g1=ctx.createGain();
+      g1.gain.setValueAtTime(vol*(1.5+impNorm*3.5),now);
+      g1.gain.exponentialRampToValueAtTime(0.001,now+dur1);
+      g1.connect(master);
+      const lp1=ctx.createBiquadFilter(); lp1.type='lowpass'; lp1.frequency.value=100+impNorm*80; lp1.Q.value=0.7;
+      const ns1=ctx.createBufferSource(); ns1.buffer=mkBuf(0.6);
+      ns1.connect(lp1); lp1.connect(g1); ns1.start(now); ns1.stop(now+dur1);
+
+      // Layer 2: Metal crunch — mid freq structural crumple
+      const dur2=0.06+impNorm*0.10;
+      const g2=ctx.createGain();
+      g2.gain.setValueAtTime(vol*(0.8+impNorm*2.0),now+0.008);
+      g2.gain.exponentialRampToValueAtTime(0.001,now+0.008+dur2);
+      g2.connect(master);
+      const bp2=ctx.createBiquadFilter(); bp2.type='bandpass'; bp2.frequency.value=380+impNorm*280; bp2.Q.value=1.8;
+      const ns2=ctx.createBufferSource(); ns2.buffer=mkBuf(0.25);
+      ns2.connect(bp2); bp2.connect(g2); ns2.start(now+0.008); ns2.stop(now+0.008+dur2);
+
+      // Layer 3: Barrier scrape — glancing hits only (sustained high grind)
+      if(tanNorm>0.25){
+        const scrapeDur=0.15+tanNorm*0.45;
+        const gs=ctx.createGain();
+        gs.gain.setValueAtTime(vol*tanNorm*1.2,now+0.02);
+        gs.gain.linearRampToValueAtTime(vol*tanNorm*0.9,now+0.02+scrapeDur*0.4);
+        gs.gain.exponentialRampToValueAtTime(0.001,now+0.02+scrapeDur);
+        gs.connect(master);
+        const bps=ctx.createBiquadFilter(); bps.type='bandpass'; bps.frequency.value=2200+tanNorm*1400; bps.Q.value=5.0;
+        const nss=ctx.createBufferSource(); nss.buffer=mkBuf(0.7);
+        nss.connect(bps); bps.connect(gs); nss.start(now+0.02); nss.stop(now+0.02+scrapeDur);
+      }
+
+      // Layer 4: Debris rattle — hard hits only
+      if(impNorm>0.4){
+        const rattleCount=2+Math.floor(impNorm*6);
+        for(let r=0;r<rattleCount;r++){
+          const rt=now+0.04+r*(0.03+Math.random()*0.07);
+          const rg=ctx.createGain();
+          rg.gain.setValueAtTime(vol*(0.1+Math.random()*0.2)*impNorm,rt);
+          rg.gain.exponentialRampToValueAtTime(0.001,rt+0.035);
+          rg.connect(master);
+          const rbp=ctx.createBiquadFilter(); rbp.type='bandpass';
+          rbp.frequency.value=800+Math.random()*2000; rbp.Q.value=4.0;
+          const rns=ctx.createBufferSource(); rns.buffer=mkBuf(0.08);
+          rns.connect(rbp); rbp.connect(rg); rns.start(rt); rns.stop(rt+0.035);
+        }
+      }
+
+      // Layer 5: Engine thud — RPM drop on very hard hit
+      if(impNorm>0.5){
+        const eg=ctx.createGain();
+        eg.gain.setValueAtTime(vol*0.4*impNorm,now+0.015);
+        eg.gain.exponentialRampToValueAtTime(0.001,now+0.18);
+        eg.connect(master);
+        const ebp=ctx.createBiquadFilter(); ebp.type='bandpass'; ebp.frequency.value=90; ebp.Q.value=3.5;
+        const ens=ctx.createBufferSource(); ens.buffer=mkBuf(0.2);
+        ens.connect(ebp); ebp.connect(eg); ens.start(now+0.015); ens.stop(now+0.18);
+      }
+
+      if(navigator.vibrate) navigator.vibrate(Math.round(15+impNorm*100));
     }
 
     // ── BRAKE SOUNDS — only when going forward ──
