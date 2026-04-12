@@ -395,8 +395,6 @@ document.getElementById('btn-session-back').addEventListener('click',()=>{
   document.body.classList.add('pre-start');
 });
 
-// Reset session penalty on new race start
-const _origStartCountdown_sess = startCountdown;
 
 // ── AUTO-SAVE GHOST ──
 let autoSaveEnabled = true;
