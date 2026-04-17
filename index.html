@@ -70,27 +70,15 @@ window.onunhandledrejection=function(e){
     <div id="track-picker-title">SELECT TRACK</div>
     <button id="btn-close-track-picker">✕</button>
   </div>
-  <div id="track-cards-scroll">
-    <!-- Card 1: Oval (active) -->
-    <div class="track-slide-card active" data-track="oval">
-      <canvas class="track-slide-canvas" id="tsc-oval"></canvas>
-      <div class="track-slide-info">
-        <div><div class="track-slide-name">OVAL</div><div class="track-slide-sub">Short oval</div></div>
-        <div class="track-slide-badge">SELECTED</div>
-      </div>
-    </div>
-    <div class="track-slide-card" data-track="my_circuit">
-      <canvas class="track-slide-canvas" id="tsc-my_circuit"></canvas>
-      <div class="track-slide-info">
-        <div><div class="track-slide-name">MY CIRCUIT</div><div class="track-slide-sub">Custom circuit</div></div>
-        <div class="track-slide-badge"></div>
-      </div>
-    </div>
-  </div>
-  <div id="track-picker-dots">
-    <div class="tp-dot active"></div>
-    <div class="tp-dot"></div>
-  </div>
+
+  <!--
+    Track cards are injected here automatically by each track's .js file.
+    To add a new track: upload its .js file and add one <script> tag below.
+  -->
+  <div id="track-cards-scroll"></div>
+
+  <!-- Dots are also injected automatically — one per track -->
+  <div id="track-picker-dots"></div>
 </div>
 <div id="top-bar"><div id="lap-display"><span>LAP</span><b id="h-lap">0</b></div></div>
 <div id="minimap-wrap"><canvas id="minimap"></canvas></div>
@@ -141,7 +129,6 @@ window.onunhandledrejection=function(e){
   <!-- Pages -->
   <div id="opt-pages">
 
-```
 <!-- PAGE 1: GENERAL -->
 <div class="opt-page active" id="page-general">
   <div class="opt-row">
@@ -460,7 +447,6 @@ window.onunhandledrejection=function(e){
   <div style="margin-top:18px;display:flex;gap:10px;flex-wrap:wrap;">
       </div>
 </div>
-```
 
   </div>
 </div>
@@ -531,6 +517,11 @@ window.onunhandledrejection=function(e){
 <div id="ctrl-grad"></div>
 
 
+<!-- ═══════════════════════════════════════════════════════════════
+     tracks.js auto-discovers all track_*.js files from GitHub.
+     To add a new track: upload track_something.js — that's it.
+     This file never needs to change.
+     ═══════════════════════════════════════════════════════════════ -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <script src="tracks.js"></script>
 <script src="sound.js"></script>
