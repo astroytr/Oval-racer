@@ -1,26 +1,17 @@
 // ══════════════════════════════════════════════════════════════════
-// TRACKS.JS — Track engine + automatic track discovery
-//
-// ── ONE-TIME SETUP ────────────────────────────────────────────────
-// Set your GitHub username and repository name below.
-// After that you never touch this file again.
+// TRACKS.JS — Track engine + track registry
 //
 // HOW TO ADD A NEW TRACK:
 //   1. Name your file  track_something.js  (must start with "track_")
-//   2. Upload it to your GitHub repo
-//   Done — it appears in the track selector automatically.
+//   2. Add a <script src="track_something.js"></script> tag in
+//      index.html BEFORE the  <script src="tracks.js">  line.
+//   3. That's it — it appears in the picker automatically.
 //
-// ── HOW IT WORKS ─────────────────────────────────────────────────
-// On load, this file queries the GitHub API for all files in your
-// repo that match track_*.js and loads them as <script> tags
-// synchronously, BEFORE sound.js / physics.js / ui.js run.
-// The picker cards are then built immediately after, so ui.js can
-// find them in the DOM and attach its handlers + draw previews.
+// NOTE: The old GitHub API auto-discovery method was removed because
+// document.write() is unreliable in modern browsers and the GitHub
+// API requires authentication. Script tags in index.html are the
+// simplest, most reliable approach.
 // ══════════════════════════════════════════════════════════════════
-
-// ▼▼▼ SET YOUR GITHUB REPO HERE (only thing you ever change) ▼▼▼
-var GITHUB_REPO = '';
-// ▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲
 
 const TW = 14;
 
@@ -32,44 +23,6 @@ function registerTrack(id, def) {
   if (!_trackOrder.includes(id)) _trackOrder.push(id);
   TRACK_DEFS[id] = def;
 }
-
-// ── PHASE 1: Auto-discover and load all track_*.js files ──────────
-// Uses synchronous XHR so tracks are guaranteed loaded before
-// physics.js and ui.js run.  document.write inserts each <script>
-// tag at this exact position in the HTML stream — the browser loads
-// and executes those scripts immediately, blocking here until done.
-(function _autoLoadTracks() {
-  var loaded = false;
-
-  try {
-    var xhr = new XMLHttpRequest();
-    if (!GITHUB_REPO) throw new Error('GitHub repo not configured');
-    xhr.open('GET', 'https://api.github.com/repos/' + GITHUB_REPO + '/contents/', false);
-    xhr.send();
-
-    if (xhr.status === 200) {
-      var files = JSON.parse(xhr.responseText);
-      var trackFiles = files
-        .filter(function(f) { return /^track_.*\.js$/i.test(f.name); })
-        .sort(function(a, b) { return a.name.localeCompare(b.name); });
-
-      if (trackFiles.length > 0) {
-        trackFiles.forEach(function(f) {
-          document.write('<scr' + 'ipt src="' + f.name + '"></scr' + 'ipt>');
-        });
-        loaded = true;
-      }
-    }
-  } catch(e) { /* fall through to fallback */ }
-
-  if (!loaded) {
-    // Fallback: used when running locally or GitHub API is unreachable.
-    // Lists tracks that should exist alongside this file.
-    ['track_oval.js'].forEach(function(name) {
-      document.write('<scr' + 'ipt src="' + name + '"></scr' + 'ipt>');
-    });
-  }
-})();
 
 // ══════════════════════════════════════════════════════════════════
 // PHASE 2 — Engine: shared functions used by physics.js and ui.js
@@ -154,8 +107,6 @@ function buildTrackPickerUI() {
         '<div class="track-slide-name">' + def.name + '</div>' +
         '<div class="track-slide-sub">'  + (def.sub || '') + '</div>' +
       '</div>' +
-      // Only render the badge div when it has content, so it doesn't
-      // show as an empty green box on non-selected cards.
       (isFirst ? '<div class="track-slide-badge">SELECTED</div>' : '');
 
     card.appendChild(canvas);

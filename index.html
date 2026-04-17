@@ -72,8 +72,10 @@ window.onunhandledrejection=function(e){
   </div>
 
   <!--
-    Track cards are injected here automatically by each track's .js file.
-    To add a new track: upload its .js file and add one <script> tag below.
+    Track cards are injected here automatically.
+    To add a new track: upload its track_*.js file and add ONE
+    <script src="track_something.js"> tag in the TRACK FILES section
+    at the bottom of this file. That's all you need to do.
   -->
   <div id="track-cards-scroll"></div>
 
@@ -518,11 +520,18 @@ window.onunhandledrejection=function(e){
 
 
 <!-- ═══════════════════════════════════════════════════════════════
-     tracks.js auto-discovers all track_*.js files from GitHub.
-     To add a new track: upload track_something.js — that's it.
-     This file never needs to change.
+     TRACK FILES — add one <script> line per track here.
+     Order matters: first track listed = default selected track.
+
+     To add a new track:
+       1. Upload your  track_something.js  file to the same folder
+       2. Add a line:  <script src="track_something.js"></script>
+       3. Done — it appears in the picker automatically.
      ═══════════════════════════════════════════════════════════════ -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script src="track_oval.js"></script>
+<script src="track_spa.js"></script>
+<!-- ADD NEW TRACKS ABOVE THIS LINE -->
 <script src="tracks.js"></script>
 <script src="sound.js"></script>
 <script src="physics.js"></script>
