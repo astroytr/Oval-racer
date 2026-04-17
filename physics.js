@@ -1983,8 +1983,8 @@ function drawTrackOnCanvas(canvasId, pts){
   ctx.fillStyle='#f0c040'; ctx.fill();
 }
 
-drawTrackOnCanvas('tsc-oval',       TRACK_DEFS.oval.build());
-drawTrackOnCanvas('tsc-my_circuit', TRACK_DEFS.my_circuit.waypoints);
+if(TRACK_DEFS.oval) drawTrackOnCanvas('tsc-oval', TRACK_DEFS.oval.build());
+if(TRACK_DEFS.my_circuit) drawTrackOnCanvas('tsc-my_circuit', TRACK_DEFS.my_circuit.waypoints);
 
 const scroll=document.getElementById('track-cards-scroll');
 const dots=document.querySelectorAll('.tp-dot');

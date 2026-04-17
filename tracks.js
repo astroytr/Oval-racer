@@ -53,7 +53,7 @@ var GITHUB_REPO = 'your-username/your-repo-name';
   if (!loaded) {
     // Fallback: used when running locally or GitHub API is unreachable.
     // Lists tracks that should exist alongside this file.
-    ['track_oval.js', 'track_my_circuit.js'].forEach(function(name) {
+    ['track_oval.js'].forEach(function(name) {
       document.write('<scr' + 'ipt src="' + name + '"></scr' + 'ipt>');
     });
   }
