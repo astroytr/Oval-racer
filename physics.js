@@ -213,12 +213,21 @@ let _trackMeshes = [];
 function buildTrack(){
   function addTrackMesh(obj){ scene.add(obj); _trackMeshes.push(obj); return obj; }
 
-  const isOval = currentTrack === 'oval';
   const cfg = TRACK_DEFS[currentTrack] || TRACK_DEFS.oval;
 
-  // ── GROUND ────────────────────────────────────────────────────────
-  const ground=new THREE.Mesh(new THREE.PlaneGeometry(2000,2000),new THREE.MeshLambertMaterial({color:0x4a7a4a}));
-  ground.rotation.x=-Math.PI/2; ground.position.y=-0.02; addTrackMesh(ground);
+  // ── Apply track sky / fog ─────────────────────────────────────────
+  // Track files may define:
+  //   sky: 0xRRGGBB                   (scene background colour)
+  //   fog: [0xRRGGBB, near, far]      (THREE.Fog params)
+  //   fog: false                      (disable fog entirely)
+  if(cfg.sky != null){
+    scene.background = new THREE.Color(cfg.sky);
+  }
+  if(cfg.fog === false){
+    scene.fog = null;
+  } else if(Array.isArray(cfg.fog)){
+    scene.fog = new THREE.Fog(cfg.fog[0], cfg.fog[1], cfg.fog[2]);
+  }
 
   // ── ASPHALT SURFACE ───────────────────────────────────────────────
   const pos=[],uvs=[],idx=[];
@@ -274,33 +283,56 @@ function buildTrack(){
   sfp.rotation.x=-Math.PI/2; sfp.rotation.z=Math.atan2(st.tx,st.tz);
   sfp.position.set(sf.x,0.03,sf.y); addTrackMesh(sfp);
 
-  // ── BARRIERS (only for oval — original single-sided style) ────────
-  if(cfg.barriers !== false){
-    const BOFF=TW/2+TW, BH=1.1, TR=0.38, BF=1.9;
-    const bv=[],bi=[],bu=[],bc=[];let bvi=0;
-    for(let i=0;i<N_PTS;i++){
-      const i1=(i+1)%N_PTS,c0=CENTRE[i],c1=CENTRE[i1];
-      const t0=tangentAt(i),t1=tangentAt(i1);
-      const nx0=-t0.tz,nz0=t0.tx,nx1=-t1.tz,nz1=t1.tx;
-      const sl2=Math.sqrt((c1.x-c0.x)**2+(c1.y-c0.y)**2);
-      const ph0=i*0.55,ph1=ph0+sl2*BF;
-      for(let s=0;s<2;s++){
-        const c=s===0?c0:c1,nx=s===0?nx0:nx1,nz=s===0?nz0:nz1,ph=s===0?ph0:ph1;
-        const bump=Math.abs(Math.sin(ph*Math.PI))*TR*0.35;
-        const bx=c.x+nx*BOFF,bz=c.y+nz*BOFF;
-        const tr2=Math.floor(ph/1.0)%2,rc=tr2===0?[0.08,0.08,0.08]:[0.14,0.12,0.10];
-        bv.push(bx,0,bz); bu.push(s,0); bc.push(...rc);
-        bv.push(bx+nx*bump*0.4,BH+bump,bz+nz*bump*0.4); bu.push(s,1); bc.push(...rc);
+  // ── TRACK SCENE (ground, barriers, decorations) ───────────────────
+  // If the track file defines buildScene(), call it — it fully owns the
+  // environment: ground colour, barriers, grandstands, trees, anything.
+  // Context object passed in:
+  //   addObj(mesh)  — adds a mesh to the scene and to the track-mesh list
+  //                   so it gets removed cleanly on track switch
+  //   THREE         — the THREE namespace
+  //   CENTRE        — centreline point array (THREE.Vector2[])
+  //   N_PTS         — centreline length
+  //   TW            — track half-width constant
+  //   tangentAt(i)  — returns {tx,tz} unit tangent at index i
+  //   scene         — the THREE.Scene (for lights, fog tweaks, etc.)
+  //
+  // If no buildScene is defined the engine falls back to the original
+  // default green ground + concrete barriers so any track file that
+  // only sets  barriers: true/false  keeps working with no changes.
+  if(typeof cfg.buildScene === 'function'){
+    cfg.buildScene({ addObj: addTrackMesh, THREE, CENTRE, N_PTS, TW, tangentAt, scene });
+  } else {
+    // ── FALLBACK: default green ground ───────────────────────────
+    const ground=new THREE.Mesh(new THREE.PlaneGeometry(2000,2000),new THREE.MeshLambertMaterial({color:0x4a7a4a}));
+    ground.rotation.x=-Math.PI/2; ground.position.y=-0.02; addTrackMesh(ground);
+    // ── FALLBACK: default concrete barriers ──────────────────────
+    if(cfg.barriers !== false){
+      const BOFF=TW/2+TW, BH=1.1, TR=0.38, BF=1.9;
+      const bv=[],bi=[],bu=[],bc=[];let bvi=0;
+      for(let i=0;i<N_PTS;i++){
+        const i1=(i+1)%N_PTS,c0=CENTRE[i],c1=CENTRE[i1];
+        const t0=tangentAt(i),t1=tangentAt(i1);
+        const nx0=-t0.tz,nz0=t0.tx,nx1=-t1.tz,nz1=t1.tx;
+        const sl2=Math.sqrt((c1.x-c0.x)**2+(c1.y-c0.y)**2);
+        const ph0=i*0.55,ph1=ph0+sl2*BF;
+        for(let s=0;s<2;s++){
+          const c=s===0?c0:c1,nx=s===0?nx0:nx1,nz=s===0?nz0:nz1,ph=s===0?ph0:ph1;
+          const bump=Math.abs(Math.sin(ph*Math.PI))*TR*0.35;
+          const bx=c.x+nx*BOFF,bz=c.y+nz*BOFF;
+          const tr2=Math.floor(ph/1.0)%2,rc=tr2===0?[0.08,0.08,0.08]:[0.14,0.12,0.10];
+          bv.push(bx,0,bz); bu.push(s,0); bc.push(...rc);
+          bv.push(bx+nx*bump*0.4,BH+bump,bz+nz*bump*0.4); bu.push(s,1); bc.push(...rc);
+        }
+        bi.push(bvi,bvi+2,bvi+1, bvi+1,bvi+2,bvi+3); bvi+=4;
       }
-      bi.push(bvi,bvi+2,bvi+1, bvi+1,bvi+2,bvi+3); bvi+=4;
+      const bg2=new THREE.BufferGeometry();
+      bg2.setAttribute('position',new THREE.Float32BufferAttribute(bv,3));
+      bg2.setAttribute('color',new THREE.Float32BufferAttribute(bc,3));
+      bg2.setAttribute('uv',new THREE.Float32BufferAttribute(bu,2));
+      bg2.setIndex(bi); bg2.computeVertexNormals();
+      const bm=new THREE.Mesh(bg2,new THREE.MeshLambertMaterial({vertexColors:true,side:THREE.DoubleSide}));
+      bm.castShadow=true; bm.receiveShadow=true; addTrackMesh(bm);
     }
-    const bg2=new THREE.BufferGeometry();
-    bg2.setAttribute('position',new THREE.Float32BufferAttribute(bv,3));
-    bg2.setAttribute('color',new THREE.Float32BufferAttribute(bc,3));
-    bg2.setAttribute('uv',new THREE.Float32BufferAttribute(bu,2));
-    bg2.setIndex(bi); bg2.computeVertexNormals();
-    const bm=new THREE.Mesh(bg2,new THREE.MeshLambertMaterial({vertexColors:true,side:THREE.DoubleSide}));
-    bm.castShadow=true; bm.receiveShadow=true; addTrackMesh(bm);
   }
 }
 checkpoint('buildTrack');
