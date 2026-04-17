@@ -743,6 +743,7 @@ document.getElementById('btn-end-session').addEventListener('click', ()=>{ LOGGE
 document.getElementById('btn-new-session').addEventListener('click', ()=>{ LOGGER.stop(); }, true);
 document.getElementById('btn-session-back').addEventListener('click', ()=>{ LOGGER.stop(); }, true);
 
+
 // ══════════════════════════════════════════
 // TRACK PICKER — open / close / select / draw previews
 // ══════════════════════════════════════════
@@ -751,97 +752,76 @@ document.getElementById('btn-session-back').addEventListener('click', ()=>{ LOGG
   const overlay  = document.getElementById('track-picker-overlay');
   const picker   = document.getElementById('track-picker');
   const closeBtn = document.getElementById('btn-close-track-picker');
-  const cardBtn  = document.getElementById('track-card');         // right-side preview card
+  const cardBtn  = document.getElementById('track-card');
   const scroll   = document.getElementById('track-cards-scroll');
   const dots     = document.getElementById('track-picker-dots');
 
   if (!overlay || !picker || !scroll) return;
 
-  // ── Draw a minimap-style preview on a canvas ──────────────────
+  // ── Draw a minimap-style preview onto a canvas ────────────────
   function drawPreview(canvas, trackId) {
     const pts = buildCentreline(trackId);
     if (!pts || pts.length < 2) return;
     const ctx = canvas.getContext('2d');
-    const W = canvas.width  = canvas.offsetWidth  || 160;
-    const H = canvas.height = canvas.offsetHeight || 110;
+    const W   = canvas.width  = canvas.offsetWidth  || 160;
+    const H   = canvas.height = canvas.offsetHeight || 110;
     ctx.clearRect(0, 0, W, H);
 
-    // Fit points into canvas with padding
-    let minX = Infinity, maxX = -Infinity, minY = Infinity, maxY = -Infinity;
-    pts.forEach(p => { minX=Math.min(minX,p.x); maxX=Math.max(maxX,p.x); minY=Math.min(minY,p.y); maxY=Math.max(maxY,p.y); });
-    const pad = 14, rx = maxX-minX || 1, ry = maxY-minY || 1;
-    const scale = Math.min((W-pad*2)/rx, (H-pad*2)/ry);
-    const ox = (W - rx*scale)/2 - minX*scale;
-    const oy = (H - ry*scale)/2 - minY*scale;
-    const sx = p => p.x*scale + ox;
-    const sy = p => p.y*scale + oy;
+    let minX=Infinity,maxX=-Infinity,minY=Infinity,maxY=-Infinity;
+    pts.forEach(p=>{ minX=Math.min(minX,p.x); maxX=Math.max(maxX,p.x); minY=Math.min(minY,p.y); maxY=Math.max(maxY,p.y); });
+    const pad=14, rx=maxX-minX||1, ry=maxY-minY||1;
+    const scale=Math.min((W-pad*2)/rx,(H-pad*2)/ry);
+    const ox=(W-rx*scale)/2-minX*scale;
+    const oy=(H-ry*scale)/2-minY*scale;
+    const sx=p=>p.x*scale+ox, sy=p=>p.y*scale+oy;
 
-    // Outer glow / track width
-    ctx.strokeStyle = 'rgba(48,224,96,0.18)';
-    ctx.lineWidth   = TW * scale * 1.8;
-    ctx.lineJoin    = ctx.lineCap = 'round';
-    ctx.beginPath();
-    ctx.moveTo(sx(pts[0]), sy(pts[0]));
-    pts.forEach(p => ctx.lineTo(sx(p), sy(p)));
-    ctx.closePath();
-    ctx.stroke();
+    // Track body glow
+    ctx.strokeStyle='rgba(48,224,96,0.18)';
+    ctx.lineWidth=TW*scale*1.8;
+    ctx.lineJoin=ctx.lineCap='round';
+    ctx.beginPath(); ctx.moveTo(sx(pts[0]),sy(pts[0]));
+    pts.forEach(p=>ctx.lineTo(sx(p),sy(p))); ctx.closePath(); ctx.stroke();
 
     // Track surface
-    ctx.strokeStyle = '#1e2e1e';
-    ctx.lineWidth   = TW * scale * 1.4;
-    ctx.beginPath();
-    ctx.moveTo(sx(pts[0]), sy(pts[0]));
-    pts.forEach(p => ctx.lineTo(sx(p), sy(p)));
-    ctx.closePath();
-    ctx.stroke();
+    ctx.strokeStyle='#1e2e1e'; ctx.lineWidth=TW*scale*1.4;
+    ctx.beginPath(); ctx.moveTo(sx(pts[0]),sy(pts[0]));
+    pts.forEach(p=>ctx.lineTo(sx(p),sy(p))); ctx.closePath(); ctx.stroke();
 
-    // Centre line
-    ctx.strokeStyle = 'rgba(48,224,96,0.7)';
-    ctx.lineWidth   = Math.max(1.5, TW * scale * 0.18);
-    ctx.setLineDash([6, 5]);
-    ctx.beginPath();
-    ctx.moveTo(sx(pts[0]), sy(pts[0]));
-    pts.forEach(p => ctx.lineTo(sx(p), sy(p)));
-    ctx.closePath();
-    ctx.stroke();
+    // Centre line (dashed)
+    ctx.strokeStyle='rgba(48,224,96,0.7)';
+    ctx.lineWidth=Math.max(1.5,TW*scale*0.18);
+    ctx.setLineDash([6,5]);
+    ctx.beginPath(); ctx.moveTo(sx(pts[0]),sy(pts[0]));
+    pts.forEach(p=>ctx.lineTo(sx(p),sy(p))); ctx.closePath(); ctx.stroke();
     ctx.setLineDash([]);
 
     // Start/finish dot
-    ctx.fillStyle = '#f0c040';
-    ctx.beginPath();
-    ctx.arc(sx(pts[0]), sy(pts[0]), Math.max(3, TW*scale*0.45), 0, Math.PI*2);
-    ctx.fill();
+    ctx.fillStyle='#f0c040';
+    ctx.beginPath(); ctx.arc(sx(pts[0]),sy(pts[0]),Math.max(3,TW*scale*0.45),0,Math.PI*2); ctx.fill();
   }
 
-  // ── Draw all previews (deferred so canvases are laid out) ─────
   function drawAllPreviews() {
     _trackOrder.forEach(id => {
-      const canvas = document.getElementById('tsc-' + id);
-      if (canvas) drawPreview(canvas, id);
+      const c = document.getElementById('tsc-'+id);
+      if (c) drawPreview(c, id);
     });
   }
 
-  // ── Update the right-side track card ──────────────────────────
   function updateTrackCard(trackId) {
-    const def = TRACK_DEFS[trackId];
-    if (!def) return;
+    const def = TRACK_DEFS[trackId]; if (!def) return;
     const nameEl = document.getElementById('track-card-name');
     const subEl  = document.getElementById('track-card-sub');
     if (nameEl) nameEl.textContent = def.name;
-    if (subEl)  subEl.textContent  = def.sub
-      + ' · ' + _trackOrder.length
-      + ' layout' + (_trackOrder.length > 1 ? 's' : '');
-    // Redraw the right-side card canvas too
-    const mainCanvas = document.getElementById('track-card-canvas');
-    if (mainCanvas) drawPreview(mainCanvas, trackId);
+    if (subEl)  subEl.textContent  = def.sub+' · '+_trackOrder.length+' layout'+(_trackOrder.length>1?'s':'');
+    const mc = document.getElementById('track-card-canvas');
+    if (mc) drawPreview(mc, trackId);
   }
 
   // ── Open ──────────────────────────────────────────────────────
   function openPicker() {
     overlay.classList.add('open');
     picker.classList.add('open');
-    // Draw previews after the sheet is visible so offsetWidth is valid
-    requestAnimationFrame(() => requestAnimationFrame(drawAllPreviews));
+    requestAnimationFrame(()=>requestAnimationFrame(drawAllPreviews));
   }
 
   // ── Close ─────────────────────────────────────────────────────
@@ -850,13 +830,11 @@ document.getElementById('btn-session-back').addEventListener('click', ()=>{ LOGG
     overlay.classList.remove('open');
   }
 
-  // ── Select a track card ───────────────────────────────────────
+  // ── Select a track ────────────────────────────────────────────
   function selectCard(id) {
-    // Update active card styling
     document.querySelectorAll('.track-slide-card').forEach(c => {
       const isActive = c.dataset.track === id;
       c.classList.toggle('active', isActive);
-      // Update the SELECTED badge: only show it on the active card
       let badge = c.querySelector('.track-slide-badge');
       if (isActive) {
         if (!badge) {
@@ -870,51 +848,33 @@ document.getElementById('btn-session-back').addEventListener('click', ()=>{ LOGG
       }
     });
 
-    // Update dots
     const dotEls = dots ? dots.querySelectorAll('.tp-dot') : [];
-    _trackOrder.forEach((tid, i) => {
-      if (dotEls[i]) dotEls[i].classList.toggle('active', tid === id);
-    });
+    _trackOrder.forEach((tid,i) => { if (dotEls[i]) dotEls[i].classList.toggle('active', tid===id); });
 
-    // Switch the active track
     initTrack(id);
     updateTrackCard(id);
-
-    // Redraw the right-side main canvas
-    const mainCanvas = document.getElementById('track-card-canvas');
-    if (mainCanvas) drawPreview(mainCanvas, id);
-
     closePicker();
   }
 
-  // ── Wire card clicks ──────────────────────────────────────────
+  // ── Wire events ───────────────────────────────────────────────
   scroll.addEventListener('click', e => {
     const card = e.target.closest('.track-slide-card');
     if (card && card.dataset.track) selectCard(card.dataset.track);
   });
 
-  // ── Sync dots when user swipes the scroll container ──────────
+  // Sync dots on swipe
   if (dots) {
     scroll.addEventListener('scroll', () => {
-      const cardW    = 160 + 12; // flex card width + gap
-      const idx      = Math.round(scroll.scrollLeft / cardW);
-      const dotEls   = dots.querySelectorAll('.tp-dot');
-      dotEls.forEach((d, i) => d.classList.toggle('active', i === idx));
-    }, { passive: true });
+      const idx = Math.round(scroll.scrollLeft / (160+12));
+      dots.querySelectorAll('.tp-dot').forEach((d,i)=>d.classList.toggle('active',i===idx));
+    }, {passive:true});
   }
 
-  // ── Open when right-side track card is clicked ────────────────
-  if (cardBtn) cardBtn.addEventListener('click', openPicker);
-
-  // ── Close buttons ──────────────────────────────────────────────
+  if (cardBtn)  cardBtn.addEventListener('click', openPicker);
   if (closeBtn) closeBtn.addEventListener('click', closePicker);
-  overlay.addEventListener('click', closePicker);
+  overlay.addEventListener('click', e => { if (e.target===overlay) closePicker(); });
 
-  // ── Draw the main track-card canvas on pre-start ──────────────
-  // The card is visible in pre-start, so draw it once the DOM settles.
-  requestAnimationFrame(() => requestAnimationFrame(() => {
-    updateTrackCard(_trackOrder[0] || 'oval');
-  }));
+  // Draw main card canvas on pre-start load
+  requestAnimationFrame(()=>requestAnimationFrame(()=>updateTrackCard(_trackOrder[0]||'oval')));
 
 })();
-
