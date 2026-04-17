@@ -19,8 +19,19 @@
 // ══════════════════════════════════════════════════════════════════
 
 // ▼▼▼ SET YOUR GITHUB REPO HERE (only thing you ever change) ▼▼▼
-var GITHUB_REPO = 'astroytr/Oval-racer';
+var GITHUB_REPO = '';
 // ▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲
+
+const TW = 14;
+
+const TRACK_DEFS  = {};
+const _trackOrder = [];
+
+function registerTrack(id, def) {
+  if (!id || !def) return;
+  if (!_trackOrder.includes(id)) _trackOrder.push(id);
+  TRACK_DEFS[id] = def;
+}
 
 // ── PHASE 1: Auto-discover and load all track_*.js files ──────────
 // Uses synchronous XHR so tracks are guaranteed loaded before
@@ -32,6 +43,7 @@ var GITHUB_REPO = 'astroytr/Oval-racer';
 
   try {
     var xhr = new XMLHttpRequest();
+    if (!GITHUB_REPO) throw new Error('GitHub repo not configured');
     xhr.open('GET', 'https://api.github.com/repos/' + GITHUB_REPO + '/contents/', false);
     xhr.send();
 
@@ -62,17 +74,6 @@ var GITHUB_REPO = 'astroytr/Oval-racer';
 // ══════════════════════════════════════════════════════════════════
 // PHASE 2 — Engine: shared functions used by physics.js and ui.js
 // ══════════════════════════════════════════════════════════════════
-
-const TW = 14;
-
-// Registry populated by each track_*.js file calling registerTrack()
-const TRACK_DEFS  = {};
-const _trackOrder = [];
-
-function registerTrack(id, def) {
-  TRACK_DEFS[id] = def;
-  _trackOrder.push(id);
-}
 
 // Catmull-Rom spline — smooths waypoints into a dense centreline
 function catmullRom(pts, nPerSeg) {
@@ -125,10 +126,10 @@ function tangentAt(i) {
 // handlers, and draw the minimap previews — exactly as if the
 // cards had been hardcoded in the HTML.
 // ══════════════════════════════════════════════════════════════════
-(function _buildTrackPickerUI() {
+function buildTrackPickerUI() {
   const scroll = document.getElementById('track-cards-scroll');
   const dots   = document.getElementById('track-picker-dots');
-  if (!scroll || !dots) return;
+  if (!scroll || !dots || !_trackOrder.length) return;
 
   scroll.innerHTML = '';
   dots.innerHTML   = '';
@@ -177,4 +178,6 @@ function tangentAt(i) {
       + ' · ' + _trackOrder.length
       + ' layout' + (_trackOrder.length > 1 ? 's' : '');
   }
-})();
+}
+
+buildTrackPickerUI();

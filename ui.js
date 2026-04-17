@@ -819,6 +819,9 @@ document.getElementById('btn-session-back').addEventListener('click', ()=>{ LOGG
 
   // ── Open ──────────────────────────────────────────────────────
   function openPicker() {
+    if (typeof buildTrackPickerUI === 'function' && scroll.children.length !== _trackOrder.length) {
+      buildTrackPickerUI();
+    }
     overlay.classList.add('open');
     picker.classList.add('open');
     requestAnimationFrame(()=>requestAnimationFrame(drawAllPreviews));

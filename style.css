@@ -409,12 +409,14 @@ position:fixed; bottom:0; left:0; right:0; z-index:200;
 background:rgba(8,8,20,.98);
 border-top:1.5px solid rgba(255,255,255,.1);
 border-radius:20px 20px 0 0;
-padding:14px 0 28px;
+padding:14px 0 calc(28px + env(safe-area-inset-bottom));
 display:flex; flex-direction:column;
 pointer-events:none;
 box-shadow:0 -8px 40px rgba(0,0,0,.8);
 transform:translateY(100%);
 transition:transform .3s cubic-bezier(.22,1,.36,1);
+min-height:292px;
+max-height:72dvh;
 }
 #track-picker.open { pointer-events:all; transform:translateY(0); }
 #track-picker-header {
@@ -438,6 +440,8 @@ padding:4px 18px 6px;
 scroll-snap-type:x mandatory;
 -webkit-overflow-scrolling:touch;
 scrollbar-width:none;
+min-height:200px;
+flex:0 0 auto;
 }
 #track-cards-scroll::-webkit-scrollbar { display:none; }
 /* Individual swipe card */

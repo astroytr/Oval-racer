@@ -162,10 +162,34 @@ scene.background = new THREE.Color(0x7ac0e8);
 scene.fog = new THREE.Fog(0x7ac0e8, 200, 680);
 const camera = new THREE.PerspectiveCamera(60, innerWidth/innerHeight, 0.1, 500);
 const _isMobile = ('ontouchstart' in window) || navigator.maxTouchPoints > 0;
-const renderer = new THREE.WebGLRenderer({ antialias: true });
-renderer.setSize(innerWidth, innerHeight);
-renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
-renderer.shadowMap.enabled = true;
+let renderer;
+try {
+  renderer = new THREE.WebGLRenderer({ antialias: true });
+  renderer.setSize(innerWidth, innerHeight);
+  renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
+  renderer.shadowMap.enabled = true;
+} catch(e) {
+  const fallbackCanvas = document.createElement('canvas');
+  fallbackCanvas.width = innerWidth;
+  fallbackCanvas.height = innerHeight;
+  fallbackCanvas.style.width = '100%';
+  fallbackCanvas.style.height = '100%';
+  renderer = {
+    domElement: fallbackCanvas,
+    shadowMap: { enabled: false },
+    setSize(w, h) {
+      fallbackCanvas.width = w;
+      fallbackCanvas.height = h;
+    },
+    setPixelRatio() {},
+    render() {}
+  };
+  const warn = document.createElement('div');
+  warn.id = 'webgl-warning';
+  warn.textContent = '3D preview needs WebGL. Track selection is still available.';
+  warn.style.cssText = 'position:fixed;left:50%;top:18px;transform:translateX(-50%);z-index:80;padding:8px 12px;border:1px solid rgba(240,192,64,.35);border-radius:10px;background:rgba(20,16,6,.82);color:#f0c040;font-family:Courier New,monospace;font-size:.62rem;letter-spacing:.08em;text-align:center;pointer-events:none;';
+  document.body.appendChild(warn);
+}
 document.getElementById('rc').appendChild(renderer.domElement);
 window.addEventListener('resize', ()=>{
   camera.aspect = innerWidth/innerHeight;
