@@ -19,7 +19,7 @@
 // ══════════════════════════════════════════════════════════════════
 
 // ▼▼▼ SET YOUR GITHUB REPO HERE (only thing you ever change) ▼▼▼
-var GITHUB_REPO = 'your-username/your-repo-name';
+var GITHUB_REPO = 'astroytr/Oval-racer';
 // ▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲
 
 // ── PHASE 1: Auto-discover and load all track_*.js files ──────────
