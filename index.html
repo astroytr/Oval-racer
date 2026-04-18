@@ -426,7 +426,16 @@ window.onunhandledrejection=function(e){
   var GITHUB_BRANCH = 'main'; // change to 'master' if your repo uses that
   // ───────────────────────────────────────────────────────────────
 
+  // Track which scripts have already been loaded to prevent double-loading
+  var _loaded = {};
+
   function loadScript(src){
+    // Normalise relative URLs so 'tracks.js' and './tracks.js' map to the same key
+    var key = src.replace(/^\.\//, '');
+    if(_loaded[key]){
+      return Promise.resolve(); // already loaded — skip silently
+    }
+    _loaded[key] = true;
     return new Promise(function(resolve){
       var s = document.createElement('script');
       s.src = src;
@@ -436,26 +445,20 @@ window.onunhandledrejection=function(e){
     });
   }
 
-  function loadGameScripts(){
+  function loadGameScripts(trackUrls){
+    // 1. tracks.js  — defines registerTrack(), TRACK_DEFS, buildCentreline, etc.
     return loadScript('tracks.js')
-      .then(function(){ return loadScript('sound.js'); })
-      .then(function(){ return loadScript('physics.js'); })
-      .then(function(){ return loadScript('ghost.js'); })
-      .then(function(){ return loadScript('ui.js'); });
-  }
-
-  function loadTracksAndStart(trackUrls){
-    // tracks.js defines registerTrack() — must load first
-    return loadScript('tracks.js')
+      // 2. All track_*.js files — must run after tracks.js so registerTrack() exists
       .then(function(){
         return trackUrls.reduce(function(p, url){
           return p.then(function(){ return loadScript(url); });
         }, Promise.resolve());
       })
+      // 3. Rebuild picker UI now all tracks are registered
       .then(function(){
-        // Rebuild picker UI now all tracks are registered
         if(typeof buildTrackPickerUI === 'function') buildTrackPickerUI();
       })
+      // 4. Rest of game scripts — physics.js reads TRACK_DEFS which is now populated
       .then(function(){ return loadScript('sound.js'); })
       .then(function(){ return loadScript('physics.js'); })
       .then(function(){ return loadScript('ghost.js'); })
@@ -482,11 +485,11 @@ window.onunhandledrejection=function(e){
         trackUrls = ['track_oval.js'];
       }
 
-      return loadTracksAndStart(trackUrls);
+      return loadGameScripts(trackUrls);
     })
     .catch(function(err){
       console.warn('GitHub API scan failed, loading local fallback:', err);
-      return loadTracksAndStart(['track_oval.js']);
+      return loadGameScripts(['track_oval.js']);
     });
 })();
 </script>
