@@ -1575,10 +1575,22 @@ const mmCanvas=document.getElementById('minimap'),mmCtx=mmCanvas.getContext('2d'
 mmCanvas.width=210;mmCanvas.height=280;
 const MMW=210,MMH=280;
 const allX=CENTRE.map(p=>p.x),allZ=CENTRE.map(p=>p.y);
-const mmMinX=Math.min(...allX),mmMaxX=Math.max(...allX),mmMinZ=Math.min(...allZ),mmMaxZ=Math.max(...allZ);
-const mmPad=18,mmSX=(MMW-mmPad*2)/(mmMaxX-mmMinX),mmSZ=(MMH-mmPad*2)/(mmMaxZ-mmMinZ);
-const mmScaleFixed=Math.min(mmSX,mmSZ);
-const mmOX=(MMW-mmPad*2-(mmMaxX-mmMinX)*mmScaleFixed)/2,mmOZ=(MMH-mmPad*2-(mmMaxZ-mmMinZ)*mmScaleFixed)/2;
+let mmMinX=Math.min(...allX),mmMaxX=Math.max(...allX),mmMinZ=Math.min(...allZ),mmMaxZ=Math.max(...allZ);
+const mmPad=18;
+let mmSX=(MMW-mmPad*2)/(mmMaxX-mmMinX),mmSZ=(MMH-mmPad*2)/(mmMaxZ-mmMinZ);
+let mmScaleFixed=Math.min(mmSX,mmSZ);
+let mmOX=(MMW-mmPad*2-(mmMaxX-mmMinX)*mmScaleFixed)/2,mmOZ=(MMH-mmPad*2-(mmMaxZ-mmMinZ)*mmScaleFixed)/2;
+
+function recomputeMinimapScale(){
+  const xs=CENTRE.map(p=>p.x), zs=CENTRE.map(p=>p.y);
+  mmMinX=Math.min(...xs); mmMaxX=Math.max(...xs);
+  mmMinZ=Math.min(...zs); mmMaxZ=Math.max(...zs);
+  mmSX=(MMW-mmPad*2)/Math.max(mmMaxX-mmMinX,1);
+  mmSZ=(MMH-mmPad*2)/Math.max(mmMaxZ-mmMinZ,1);
+  mmScaleFixed=Math.min(mmSX,mmSZ);
+  mmOX=(MMW-mmPad*2-(mmMaxX-mmMinX)*mmScaleFixed)/2;
+  mmOZ=(MMH-mmPad*2-(mmMaxZ-mmMinZ)*mmScaleFixed)/2;
+}
 
 // Minimap mode: 'fixed' = whole track scaled to fit | 'moving' = track window follows car
 let mmMode='fixed';
@@ -1896,6 +1908,7 @@ function rebuildTrack(trackId){
   // Rebuild centreline + geometry
   initTrack(trackId);
   buildTrack();
+  recomputeMinimapScale();
   rebakeMinimapTrack();
   // Position car behind new start line
   const sf = CENTRE[0], st = tangentAt(0);
@@ -2039,8 +2052,16 @@ function drawTrackOnCanvas(canvasId, pts){
   ctx.fillStyle='#f0c040'; ctx.fill();
 }
 
-if(TRACK_DEFS.oval) drawTrackOnCanvas('tsc-oval', TRACK_DEFS.oval.build());
-if(TRACK_DEFS.my_circuit) drawTrackOnCanvas('tsc-my_circuit', TRACK_DEFS.my_circuit.waypoints);
+// Draw thumbnails for all registered tracks dynamically
+_trackOrder.forEach(id => {
+  const def = TRACK_DEFS[id];
+  if (!def) return;
+  if (def.build) {
+    drawTrackOnCanvas('tsc-' + id, def.build());
+  } else if (def.waypoints) {
+    drawTrackOnCanvas('tsc-' + id, def.waypoints);
+  }
+});
 
 const scroll=document.getElementById('track-cards-scroll');
 const dots=document.querySelectorAll('.tp-dot');
