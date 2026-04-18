@@ -205,6 +205,7 @@ scene.add(new THREE.AmbientLight(0x88b8d8, 0.7));
 // buildCentreline, initTrack, tangentAt  →  tracks.js
 
 checkpoint('initTrack');
+buildTrackPickerUI();
 initTrack('oval');
 
 // Must be declared before buildTrack() which uses addTrackMesh()

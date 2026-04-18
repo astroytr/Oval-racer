@@ -131,4 +131,4 @@ function buildTrackPickerUI() {
   }
 }
 
-buildTrackPickerUI();
+// buildTrackPickerUI() is called by physics.js after all track scripts have loaded.
