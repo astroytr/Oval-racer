@@ -1,5 +1,4 @@
 <!DOCTYPE html>
-
 <html lang="en">
 <head>
 <meta charset="UTF-8">
@@ -32,7 +31,6 @@ window.onunhandledrejection=function(e){
 <div id="prestart-scanlines"></div>
 
 <div id="prestart-ui">
-  <!-- Player name — absolute top left -->
   <div id="player-name-wrap">
     <div id="player-name-display">
       <span>DRIVER</span>
@@ -49,8 +47,6 @@ window.onunhandledrejection=function(e){
   </div>
 </div>
 
-<!-- Track card — sits below start button, same width -->
-
 <div id="track-card">
   <canvas id="track-card-canvas"></canvas>
   <div id="track-card-info">
@@ -62,31 +58,26 @@ window.onunhandledrejection=function(e){
   </div>
 </div>
 
-<!-- Track picker modal — centred -->
-
 <div id="track-picker-overlay"></div>
 <div id="track-picker">
   <div id="track-picker-header">
     <div id="track-picker-title">SELECT TRACK</div>
     <button id="btn-close-track-picker">✕</button>
   </div>
-
   <!--
-    Track cards are injected here automatically.
-    To add a new track: upload its track_*.js file and add ONE
-    <script src="track_something.js"> tag in the TRACK FILES section
-    at the bottom of this file. That's all you need to do.
+    HOW TO ADD TRACKS:
+    1. Name your file  track_something.js  (must start with "track_")
+    2. Upload it to this same GitHub repo folder
+    3. Done — it appears in the picker automatically on next page load!
   -->
   <div id="track-cards-scroll"></div>
-
-  <!-- Dots are also injected automatically — one per track -->
   <div id="track-picker-dots"></div>
 </div>
+
 <div id="top-bar"><div id="lap-display"><span>LAP</span><b id="h-lap">0</b></div></div>
 <div id="minimap-wrap"><canvas id="minimap"></canvas></div>
-
 <div id="best-display">BEST <b id="h-best">--</b></div>
-<div id="options-wrap"><button id="btn-cam" title="Camera mode"><svg width="16" height="11" viewBox="0 0 16 11" fill="none" xmlns="http://www.w3.org/2000/svg"><rect x="0.75" y="2.75" width="10.5" height="7.5" rx="1.25" stroke="white" stroke-width="1.5" fill="none"/><path d="M11.5 5.5L15 3.5V8.5L11.5 6.5" stroke="white" stroke-width="1.5" stroke-linejoin="round" fill="none"/><circle cx="5.5" cy="6.5" r="1.5" stroke="white" stroke-width="1.2" fill="none"/><rect x="4" y="1" width="4" height="2" rx="0.75" stroke="white" stroke-width="1.2" fill="none"/></svg><span id="cam-mode-letter">C</span></button><button id="btn-options">OPTIONS</button></div>
+<div id="options-wrap"><button id="btn-cam" title="Camera mode"><svg width="16" height="11" viewBox="0 0 16 11" fill="none" xmlns="http://www.w3.org/2000/svg"><rect x="0.75" y="2.75" width="10.5" height="7.5" rx="1.25" stroke="white" stroke-width="1.5" fill="none"/><path d="M11.5 5.5L15 3.5V8.5L11.5 6.5" stroke="white" stroke-width="1.5" stroke-linejoin="round" fill="none"/><circle cx="5.5" cy="6.5" r="1.5" stroke="white" stroke-width="1.2" fill="none"/><rect x="4" y="1" width="4" height="2" rx="0.5" stroke="white" stroke-width="1.2" fill="none"/></svg></button><button id="btn-options">OPTIONS</button></div>
 <button id="btn-pre-settings">SETTINGS</button>
 <div id="tools-island"><div id="tools-island-inner"><div class="tools-row"><button class="tool-btn" id="tool-minus">−</button><button class="tool-btn" id="tool-plus">+</button><button class="tool-btn" id="tool-done">✓</button><button class="tool-btn" id="tool-exit">✕</button></div><button id="tool-reset">↺ RESET ALL</button></div></div>
 <div id="spd-wrap"><div id="spd-big">0 <span id="spd-unit">km/h</span></div></div>
@@ -103,12 +94,10 @@ window.onunhandledrejection=function(e){
 <div id="gear-big">1</div>
 
 <div id="opt-panel">
-  <!-- Persistent top bar: close button left, always visible -->
   <div id="opt-panel-topbar">
     <button id="btn-close-panel-top">✕ CLOSE</button>
     <div id="opt-panel-topbar-spacer"></div>
   </div>
-  <!-- Tab label + headers -->
   <div id="opt-tab-label">GENERAL</div>
   <div id="opt-tabs-wrap">
     <div id="opt-tabs">
@@ -128,10 +117,8 @@ window.onunhandledrejection=function(e){
       </div>
     </div>
   </div>
-  <!-- Pages -->
   <div id="opt-pages">
 
-<!-- PAGE 1: GENERAL -->
 <div class="opt-page active" id="page-general">
   <div class="opt-row">
     <button id="btn-goto-ghost" style="width:100%;font-family:'Courier New',monospace;font-size:.7rem;letter-spacing:.12em;padding:10px;border-radius:8px;cursor:pointer;background:rgba(180,200,255,.08);border:1px solid rgba(180,200,255,.25);color:#aaddff;">👻 GHOST SETTINGS →</button>
@@ -162,7 +149,6 @@ window.onunhandledrejection=function(e){
   </div>
 </div>
 
-<!-- PAGE: GHOST -->
 <div class="opt-page" id="page-ghost">
   <div class="opt-row">
     <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;">
@@ -174,9 +160,7 @@ window.onunhandledrejection=function(e){
         <button id="btn-ghost-off" style="font-family:'Courier New',monospace;font-size:.58rem;letter-spacing:.06em;padding:4px 8px;border-radius:6px;cursor:pointer;background:rgba(48,224,96,.15);border:1px solid #30e060;color:#30e060;">ON</button>
       </div>
     </div>
-    <div id="ghost-subpanel">
-      <div id="ghost-saved-list"></div>
-    </div>
+    <div id="ghost-subpanel"><div id="ghost-saved-list"></div></div>
     <div class="opt-desc" id="ghost-status-lbl">Real-time: shows your best lap ghost</div>
   </div>
   <div class="opt-row">
@@ -203,32 +187,17 @@ window.onunhandledrejection=function(e){
   </div>
 </div>
 
-<!-- PAGE 2: SENSITIVITY -->
 <div class="opt-page" id="page-sensitivity">
-  <!-- ASSISTS ROW -->
   <div class="opt-row">
     <div class="opt-lbl" style="margin-bottom:8px;">ASSISTS</div>
     <div id="assist-btns" style="display:flex;gap:6px;margin-bottom:4px;">
-      <button class="assist-btn" id="assist-easy" data-level="easy"
-        style="flex:1;font-family:'Courier New',monospace;font-size:.6rem;letter-spacing:.08em;padding:7px 4px;border-radius:7px;cursor:pointer;border:1.5px solid rgba(255,255,255,.2);background:rgba(255,255,255,.06);color:#777;">
-        EASY
-      </button>
-      <button class="assist-btn active" id="assist-medium" data-level="medium"
-        style="flex:1;font-family:'Courier New',monospace;font-size:.6rem;letter-spacing:.08em;padding:7px 4px;border-radius:7px;cursor:pointer;border:1.5px solid #30e060;background:rgba(48,224,96,.18);color:#30e060;">
-        MEDIUM
-      </button>
-      <button class="assist-btn" id="assist-hard" data-level="hard"
-        style="flex:1;font-family:'Courier New',monospace;font-size:.6rem;letter-spacing:.08em;padding:7px 4px;border-radius:7px;cursor:pointer;border:1.5px solid rgba(255,255,255,.2);background:rgba(255,255,255,.06);color:#777;">
-        HARD
-      </button>
+      <button class="assist-btn" id="assist-easy" data-level="easy" style="flex:1;font-family:'Courier New',monospace;font-size:.6rem;letter-spacing:.08em;padding:7px 4px;border-radius:7px;cursor:pointer;border:1.5px solid rgba(255,255,255,.2);background:rgba(255,255,255,.06);color:#777;">EASY</button>
+      <button class="assist-btn active" id="assist-medium" data-level="medium" style="flex:1;font-family:'Courier New',monospace;font-size:.6rem;letter-spacing:.08em;padding:7px 4px;border-radius:7px;cursor:pointer;border:1.5px solid #30e060;background:rgba(48,224,96,.18);color:#30e060;">MEDIUM</button>
+      <button class="assist-btn" id="assist-hard" data-level="hard" style="flex:1;font-family:'Courier New',monospace;font-size:.6rem;letter-spacing:.08em;padding:7px 4px;border-radius:7px;cursor:pointer;border:1.5px solid rgba(255,255,255,.2);background:rgba(255,255,255,.06);color:#777;">HARD</button>
     </div>
-    <div id="assist-desc" class="opt-desc" style="margin-top:4px;">Stability control · ABS · Traction control </div>
+    <div id="assist-desc" class="opt-desc" style="margin-top:4px;">TC + ABS, no steering assist</div>
   </div>
-
-  <!-- DIVIDER -->
   <div style="border-top:1px solid rgba(255,255,255,.08);margin:4px 0 8px;"></div>
-
-  <!-- STEERING -->
   <div class="opt-row">
     <div class="opt-lbl">STEERING SENSITIVITY <span id="lbl-ss">5</span></div>
     <div class="opt-desc">How far the wheels turn</div>
@@ -239,8 +208,6 @@ window.onunhandledrejection=function(e){
     <div class="opt-desc">How fast steering responds</div>
     <input type="range" id="sl-sp" min="1" max="14" step="1" value="6">
   </div>
-
-  <!-- PHYSICS SLIDERS -->
   <div class="opt-row">
     <div class="opt-lbl">TRACTION <span id="lbl-traction">5</span></div>
     <div class="opt-desc">Grip limit before wheelspin</div>
@@ -256,8 +223,6 @@ window.onunhandledrejection=function(e){
     <div class="opt-desc">Engine power delivery rate</div>
     <input type="range" id="sl-throttle" min="1" max="10" step="1" value="5">
   </div>
-
-  <!-- CAMERA -->
   <div class="opt-row">
     <div class="opt-lbl">CAMERA HEIGHT <span id="lbl-ch">5</span></div>
     <div class="opt-desc">Camera height above car</div>
@@ -268,132 +233,73 @@ window.onunhandledrejection=function(e){
     <div class="opt-desc">Camera distance behind car</div>
     <input type="range" id="sl-cd" min="3" max="22" step="1" value="9">
   </div>
-
-  <div style="margin-top:14px;display:flex;gap:10px;flex-wrap:wrap;">
-      </div>
 </div>
 
-<!-- PAGE 3: CONTROLS -->
 <div class="opt-page" id="page-controls">
   <div class="opt-row" style="gap:10px;">
     <div class="opt-lbl" style="margin-bottom:10px;">TOUCH CONTROLS</div>
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
-      <div style="background:rgba(255,255,255,.05);border-radius:8px;padding:10px 12px;">
-        <div style="color:#f0c040;font-size:.6rem;letter-spacing:.1em;margin-bottom:4px;">◀ ▶ STEER</div>
-        <div class="opt-desc">Left / Right buttons</div>
-      </div>
-      <div style="background:rgba(255,255,255,.05);border-radius:8px;padding:10px 12px;">
-        <div style="color:#f0c040;font-size:.6rem;letter-spacing:.1em;margin-bottom:4px;">▲ THROTTLE</div>
-        <div class="opt-desc">Gas button bottom right</div>
-      </div>
-      <div style="background:rgba(255,255,255,.05);border-radius:8px;padding:10px 12px;">
-        <div style="color:#f0c040;font-size:.6rem;letter-spacing:.1em;margin-bottom:4px;">▼ BRAKE</div>
-        <div class="opt-desc">Brake button bottom right</div>
-      </div>
-      <div style="background:rgba(255,255,255,.05);border-radius:8px;padding:10px 12px;">
-        <div style="color:#f0c040;font-size:.6rem;letter-spacing:.1em;margin-bottom:4px;">HB HANDBRAKE</div>
-        <div class="opt-desc">Tap to toggle handbrake</div>
-      </div>
+      <div style="background:rgba(255,255,255,.05);border-radius:8px;padding:10px 12px;"><div style="color:#f0c040;font-size:.6rem;letter-spacing:.1em;margin-bottom:4px;">◀ ▶ STEER</div><div class="opt-desc">Left / Right buttons</div></div>
+      <div style="background:rgba(255,255,255,.05);border-radius:8px;padding:10px 12px;"><div style="color:#f0c040;font-size:.6rem;letter-spacing:.1em;margin-bottom:4px;">▲ THROTTLE</div><div class="opt-desc">Gas button bottom right</div></div>
+      <div style="background:rgba(255,255,255,.05);border-radius:8px;padding:10px 12px;"><div style="color:#f0c040;font-size:.6rem;letter-spacing:.1em;margin-bottom:4px;">▼ BRAKE</div><div class="opt-desc">Brake button bottom right</div></div>
+      <div style="background:rgba(255,255,255,.05);border-radius:8px;padding:10px 12px;"><div style="color:#f0c040;font-size:.6rem;letter-spacing:.1em;margin-bottom:4px;">HB HANDBRAKE</div><div class="opt-desc">Tap to toggle handbrake</div></div>
     </div>
     <div class="opt-lbl" style="margin-top:14px;margin-bottom:10px;">KEYBOARD</div>
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
-      <div style="background:rgba(255,255,255,.05);border-radius:8px;padding:10px 12px;">
-        <div style="color:#f0c040;font-size:.6rem;letter-spacing:.1em;margin-bottom:4px;">W / ↑</div>
-        <div class="opt-desc">Throttle</div>
-      </div>
-      <div style="background:rgba(255,255,255,.05);border-radius:8px;padding:10px 12px;">
-        <div style="color:#f0c040;font-size:.6rem;letter-spacing:.1em;margin-bottom:4px;">S / ↓</div>
-        <div class="opt-desc">Brake / Reverse</div>
-      </div>
-      <div style="background:rgba(255,255,255,.05);border-radius:8px;padding:10px 12px;">
-        <div style="color:#f0c040;font-size:.6rem;letter-spacing:.1em;margin-bottom:4px;">A / ←</div>
-        <div class="opt-desc">Steer left</div>
-      </div>
-      <div style="background:rgba(255,255,255,.05);border-radius:8px;padding:10px 12px;">
-        <div style="color:#f0c040;font-size:.6rem;letter-spacing:.1em;margin-bottom:4px;">D / →</div>
-        <div class="opt-desc">Steer right</div>
-      </div>
-      <div style="background:rgba(255,255,255,.05);border-radius:8px;padding:10px 12px;">
-        <div style="color:#f0c040;font-size:.6rem;letter-spacing:.1em;margin-bottom:4px;">SPACE</div>
-        <div class="opt-desc">Toggle handbrake</div>
-      </div>
+      <div style="background:rgba(255,255,255,.05);border-radius:8px;padding:10px 12px;"><div style="color:#f0c040;font-size:.6rem;letter-spacing:.1em;margin-bottom:4px;">W / ↑</div><div class="opt-desc">Throttle</div></div>
+      <div style="background:rgba(255,255,255,.05);border-radius:8px;padding:10px 12px;"><div style="color:#f0c040;font-size:.6rem;letter-spacing:.1em;margin-bottom:4px;">S / ↓</div><div class="opt-desc">Brake / Reverse</div></div>
+      <div style="background:rgba(255,255,255,.05);border-radius:8px;padding:10px 12px;"><div style="color:#f0c040;font-size:.6rem;letter-spacing:.1em;margin-bottom:4px;">A / ←</div><div class="opt-desc">Steer left</div></div>
+      <div style="background:rgba(255,255,255,.05);border-radius:8px;padding:10px 12px;"><div style="color:#f0c040;font-size:.6rem;letter-spacing:.1em;margin-bottom:4px;">D / →</div><div class="opt-desc">Steer right</div></div>
+      <div style="background:rgba(255,255,255,.05);border-radius:8px;padding:10px 12px;"><div style="color:#f0c040;font-size:.6rem;letter-spacing:.1em;margin-bottom:4px;">SPACE</div><div class="opt-desc">Toggle handbrake</div></div>
     </div>
   </div>
-  <div style="margin-top:18px;display:flex;gap:10px;flex-wrap:wrap;">
-      </div>
 </div>
 
-
-<!-- PAGE 5: SOUND -->
 <div class="opt-page" id="page-sound">
   <div class="opt-row">
-
-    <!-- Top close + master on/off row -->
     <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;">
       <div class="opt-lbl" style="margin:0;">SOUND</div>
       <div style="display:flex;gap:8px;align-items:center;">
         <button id="snd-master-btn" class="assist-btn active" style="min-width:64px;">ON</button>
       </div>
     </div>
-
-    <!-- Master -->
     <div class="opt-lbl">MASTER <span id="lbl-snd-engine">10</span></div>
     <input type="range" class="opt-slider snd-slider" id="sl-snd-engine" min="0" max="10" value="10">
-
     <div class="opt-lbl" style="margin-top:12px;opacity:0.5;font-size:10px;letter-spacing:1px;">── ENGINE ──────────────────</div>
-
     <div class="opt-lbl" style="margin-top:6px;">CYLINDERS <span id="lbl-snd-cyl">10</span></div>
     <input type="range" class="opt-slider snd-slider" id="sl-snd-cyl" min="0" max="10" value="10">
-
     <div class="opt-lbl" style="margin-top:8px;">HARMONICS / NOISE <span id="lbl-snd-harm">10</span></div>
     <input type="range" class="opt-slider snd-slider" id="sl-snd-harm" min="0" max="10" value="10">
-
     <div class="opt-lbl" style="margin-top:8px;">INTAKE / AIR HISS <span id="lbl-snd-exhaust">10</span></div>
     <input type="range" class="opt-slider snd-slider" id="sl-snd-exhaust" min="0" max="10" value="10">
-
     <div class="opt-lbl" style="margin-top:8px;">SHIFT BLIP <span id="lbl-snd-blip">10</span></div>
     <input type="range" class="opt-slider snd-slider" id="sl-snd-blip" min="0" max="10" value="10">
-
     <div class="opt-lbl" style="margin-top:8px;">DECEL BURBLE <span id="lbl-snd-burble">10</span></div>
     <input type="range" class="opt-slider snd-slider" id="sl-snd-burble" min="0" max="10" value="10">
-
     <div class="opt-lbl" style="margin-top:8px;">POPS &amp; CRACKLES <span id="lbl-snd-crash">10</span></div>
     <input type="range" class="opt-slider snd-slider" id="sl-snd-crash" min="0" max="10" value="10">
-
     <div class="opt-lbl" style="margin-top:12px;opacity:0.5;font-size:10px;letter-spacing:1px;">── ENGINE CHARACTER ────────</div>
-
     <div class="opt-lbl" style="margin-top:6px;">GROWL / BODY <span id="lbl-snd-growl">10</span></div>
     <input type="range" class="opt-slider snd-slider" id="sl-snd-growl" min="0" max="10" value="10">
-
     <div class="opt-lbl" style="margin-top:8px;">SCREAM / HIGH RPM <span id="lbl-snd-scream">10</span></div>
     <input type="range" class="opt-slider snd-slider" id="sl-snd-scream" min="0" max="10" value="10">
-
     <div class="opt-lbl" style="margin-top:8px;">RASP / DISTORTION <span id="lbl-snd-rasp">10</span></div>
     <input type="range" class="opt-slider snd-slider" id="sl-snd-rasp" min="0" max="10" value="10">
-
     <div class="opt-lbl" style="margin-top:8px;">BASS / IDLE THUMP <span id="lbl-snd-bass">10</span></div>
     <input type="range" class="opt-slider snd-slider" id="sl-snd-bass" min="0" max="10" value="10">
-
     <div class="opt-lbl" style="margin-top:12px;opacity:0.5;font-size:10px;letter-spacing:1px;">── TYRES ───────────────────</div>
-
     <div class="opt-lbl" style="margin-top:6px;">TYRE SQUEAL <span id="lbl-snd-tyre">10</span></div>
     <input type="range" class="opt-slider snd-slider" id="sl-snd-tyre" min="0" max="10" value="10">
-
     <div class="opt-lbl" style="margin-top:8px;">BRAKE DISC HISS <span id="lbl-snd-hiss">10</span></div>
     <input type="range" class="opt-slider snd-slider" id="sl-snd-hiss" min="0" max="10" value="10">
-
     <div class="opt-lbl" style="margin-top:8px;">HANDBRAKE SCRUB <span id="lbl-snd-hb">10</span></div>
     <input type="range" class="opt-slider snd-slider" id="sl-snd-hb" min="0" max="10" value="10">
-
     <div class="opt-lbl" style="margin-top:12px;opacity:0.5;font-size:10px;letter-spacing:1px;">── GHOST CAR ───────────────</div>
-
     <div class="opt-lbl" style="margin-top:6px;">GHOST ENGINE <span id="lbl-snd-ghost-sound">7</span></div>
     <input type="range" class="opt-slider snd-slider" id="sl-snd-ghost-sound" min="0" max="10" value="7">
-
   </div>
 </div>
 
-<!-- PAGE: LOG -->
 <div class="opt-page" id="page-log">
   <div class="opt-row">
     <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;">
@@ -412,17 +318,13 @@ window.onunhandledrejection=function(e){
       <div id="log-copy-feedback" style="font-size:.6rem;color:#30e060;letter-spacing:.08em;height:16px;transition:opacity .3s;opacity:0;">✓ LOG COPIED TO CLIPBOARD</div>
     </div>
   </div>
-  <div style="margin-top:14px;">
-  </div>
 </div>
 
-<!-- PAGE 4: LEADERBOARD -->
 <div class="opt-page" id="page-leaderboard">
   <div id="lb-subtabs">
     <div class="lb-subtab active" id="lbsub-ghost">GHOST LAPS</div>
     <div class="lb-subtab"       id="lbsub-player">PLAYER SESSIONS</div>
   </div>
-  <!-- Ghost leaderboard -->
   <div id="lb-ghost-panel">
     <table id="lb-table" style="width:100%;border-collapse:collapse;">
       <thead><tr>
@@ -434,7 +336,6 @@ window.onunhandledrejection=function(e){
     </table>
     <div id="lb-empty" style="display:none;color:#444;font-size:.62rem;text-align:center;padding:24px 0;letter-spacing:.1em;">No saved ghosts yet.</div>
   </div>
-  <!-- Player leaderboard -->
   <div id="lb-player-panel" style="display:none;">
     <table id="lb-player-table" style="width:100%;border-collapse:collapse;">
       <thead><tr>
@@ -446,8 +347,6 @@ window.onunhandledrejection=function(e){
     </table>
     <div id="lb-player-empty" style="display:none;color:#444;font-size:.62rem;text-align:center;padding:24px 0;letter-spacing:.1em;">No sessions recorded yet.</div>
   </div>
-  <div style="margin-top:18px;display:flex;gap:10px;flex-wrap:wrap;">
-      </div>
 </div>
 
   </div>
@@ -518,25 +417,79 @@ window.onunhandledrejection=function(e){
 <div id="btn-thr"   class="btn ctrl-btn">▲</div>
 <div id="ctrl-grad"></div>
 
-
-<!-- ═══════════════════════════════════════════════════════════════
-     TRACK FILES — add one <script> line per track here.
-     Order matters: first track listed = default selected track.
-
-     To add a new track:
-       1. Upload your  track_something.js  file to the same folder
-       2. Add a line:  <script src="track_something.js"></script>
-       3. Done — it appears in the picker automatically.
-     ═══════════════════════════════════════════════════════════════ -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-<script src="track_oval.js"></script>
-<script src="track_spa.js"></script>
-<!-- ADD NEW TRACKS ABOVE THIS LINE -->
-<script src="tracks.js"></script>
-<script src="sound.js"></script>
-<script src="physics.js"></script>
-<script src="ghost.js"></script>
-<script src="ui.js"></script>
+<script>
+(function(){
+  // ── CONFIG ─────────────────────────────────────────────────────
+  var GITHUB_USER = 'astroytr';
+  var GITHUB_REPO = 'Oval-racer';
+  var GITHUB_BRANCH = 'main'; // change to 'master' if your repo uses that
+  // ───────────────────────────────────────────────────────────────
+
+  function loadScript(src){
+    return new Promise(function(resolve){
+      var s = document.createElement('script');
+      s.src = src;
+      s.onload = resolve;
+      s.onerror = function(){ console.warn('Failed to load: ' + src); resolve(); };
+      document.head.appendChild(s);
+    });
+  }
+
+  function loadGameScripts(){
+    return loadScript('tracks.js')
+      .then(function(){ return loadScript('sound.js'); })
+      .then(function(){ return loadScript('physics.js'); })
+      .then(function(){ return loadScript('ghost.js'); })
+      .then(function(){ return loadScript('ui.js'); });
+  }
+
+  function loadTracksAndStart(trackUrls){
+    // tracks.js defines registerTrack() — must load first
+    return loadScript('tracks.js')
+      .then(function(){
+        return trackUrls.reduce(function(p, url){
+          return p.then(function(){ return loadScript(url); });
+        }, Promise.resolve());
+      })
+      .then(function(){
+        // Rebuild picker UI now all tracks are registered
+        if(typeof buildTrackPickerUI === 'function') buildTrackPickerUI();
+      })
+      .then(function(){ return loadScript('sound.js'); })
+      .then(function(){ return loadScript('physics.js'); })
+      .then(function(){ return loadScript('ghost.js'); })
+      .then(function(){ return loadScript('ui.js'); });
+  }
+
+  // Scan GitHub repo for all track_*.js files using the GitHub Contents API
+  var apiUrl = 'https://api.github.com/repos/' + GITHUB_USER + '/' + GITHUB_REPO + '/contents/?ref=' + GITHUB_BRANCH;
+
+  fetch(apiUrl)
+    .then(function(r){
+      if(!r.ok) throw new Error('GitHub API returned ' + r.status);
+      return r.json();
+    })
+    .then(function(files){
+      // Filter for track_*.js files and sort alphabetically
+      var trackUrls = files
+        .filter(function(f){ return f.type === 'file' && /^track_.+\.js$/i.test(f.name); })
+        .sort(function(a, b){ return a.name.localeCompare(b.name); })
+        .map(function(f){ return f.download_url; }); // raw.githubusercontent.com URL
+
+      if(trackUrls.length === 0){
+        console.warn('No track_*.js files found in repo, using fallback');
+        trackUrls = ['track_oval.js'];
+      }
+
+      return loadTracksAndStart(trackUrls);
+    })
+    .catch(function(err){
+      console.warn('GitHub API scan failed, loading local fallback:', err);
+      return loadTracksAndStart(['track_oval.js']);
+    });
+})();
+</script>
 
 </body>
 </html>
