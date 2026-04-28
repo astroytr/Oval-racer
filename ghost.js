@@ -38,7 +38,18 @@ let _multiGhosts = [];              // [{id,name,frames,group,lapLabel,active,la
 
 // localStorage helpers
 function loadSavedGhosts(){ try{return JSON.parse(localStorage.getItem('sc_ghosts')||'{}');}catch(e){return{};} }
-function saveSavedGhosts(o){ localStorage.setItem('sc_ghosts',JSON.stringify(o)); }
+function saveSavedGhosts(o){
+  try {
+    localStorage.setItem('sc_ghosts', JSON.stringify(o));
+  } catch(e) {
+    if(e.name==='QuotaExceededError' || e.code===22){
+      const entries = Object.entries(o).sort((a,b) => parseFloat(b[1].lapTime) - parseFloat(a[1].lapTime));
+      entries.shift();
+      const pruned = Object.fromEntries(entries);
+      saveSavedGhosts(pruned);
+    }
+  }
+}
 
 // ── Destroy/rebuild multi ghost groups ──
 function _clearMultiGhosts(){
