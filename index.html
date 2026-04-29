@@ -5,6 +5,44 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
 <title>Oval Racer 3D</title>
 <link rel="stylesheet" href="style.css">
+<style>
+#btn-cam {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 10px 5px 8px;
+  border-radius: 20px;
+  border: 1px solid rgba(255,255,255,0.18);
+  background: rgba(255,255,255,0.08);
+  color: #fff;
+  font-size: 10px;
+  font-family: inherit;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  cursor: pointer;
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  transition: background 0.15s, border-color 0.15s, color 0.15s;
+  white-space: nowrap;
+}
+#btn-cam:active { background: rgba(255,255,255,0.18); }
+#btn-cam.cam-hood {
+  background: rgba(99,200,255,0.15);
+  border-color: rgba(99,200,255,0.45);
+  color: #7de4ff;
+}
+#btn-cam.cam-bumper {
+  background: rgba(255,180,50,0.15);
+  border-color: rgba(255,180,50,0.45);
+  color: #ffc94d;
+}
+#cam-mode-letter {
+  font-size: 9px;
+  font-weight: 800;
+  letter-spacing: 0.1em;
+  line-height: 1;
+}
+</style>
 </head>
 <body class="pre-start">
 <div id="err-overlay" style="display:none;position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,.95);color:#ff4444;font-family:monospace;font-size:.75rem;padding:20px;overflow-y:auto;white-space:pre-wrap;"></div>
@@ -77,7 +115,7 @@ window.onunhandledrejection=function(e){
 <div id="top-bar"><div id="lap-display"><span>LAP</span><b id="h-lap">0</b></div></div>
 <div id="minimap-wrap"><canvas id="minimap"></canvas></div>
 <div id="best-display">BEST <b id="h-best">--</b></div>
-<div id="options-wrap"><button id="btn-cam" title="Camera mode"><svg width="16" height="11" viewBox="0 0 16 11" fill="none" xmlns="http://www.w3.org/2000/svg"><rect x="0.75" y="2.75" width="10.5" height="7.5" rx="1.25" stroke="white" stroke-width="1.5" fill="none"/><path d="M11.5 5.5L15 3.5V8.5L11.5 6.5" stroke="white" stroke-width="1.5" stroke-linejoin="round" fill="none"/><circle cx="5.5" cy="6.5" r="1.5" stroke="white" stroke-width="1.2" fill="none"/><rect x="4" y="1" width="4" height="2" rx="0.5" stroke="white" stroke-width="1.2" fill="none"/></svg></button><button id="btn-options">OPTIONS</button></div>
+<div id="options-wrap"><button id="btn-cam" title="Camera mode"><svg width="13" height="10" viewBox="0 0 16 11" fill="none" xmlns="http://www.w3.org/2000/svg"><rect x="0.75" y="2.75" width="10.5" height="7.5" rx="1.25" stroke="currentColor" stroke-width="1.5" fill="none"/><path d="M11.5 5.5L15 3.5V8.5L11.5 6.5" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round" fill="none"/><circle cx="5.5" cy="6.5" r="1.5" stroke="currentColor" stroke-width="1.2" fill="none"/><rect x="4" y="1" width="4" height="2" rx="0.5" stroke="currentColor" stroke-width="1.2" fill="none"/></svg><span id="cam-mode-letter">CHASE</span></button><button id="btn-options">OPTIONS</button></div>
 <button id="btn-pre-settings">SETTINGS</button>
 <div id="tools-island"><div id="tools-island-inner"><div class="tools-row"><button class="tool-btn" id="tool-minus">−</button><button class="tool-btn" id="tool-plus">+</button><button class="tool-btn" id="tool-done">✓</button><button class="tool-btn" id="tool-exit">✕</button></div><button id="tool-reset">↺ RESET ALL</button></div></div>
 <div id="spd-wrap"><div id="spd-big">0 <span id="spd-unit">km/h</span></div></div>

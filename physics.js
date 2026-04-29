@@ -1359,12 +1359,12 @@ function physics(dt){
 let camMode = 'chase';
 const _camBtn = document.getElementById('btn-cam');
 const _camLetter = document.getElementById('cam-mode-letter');
-const _CAM_LETTERS = { chase: 'C', hood: 'H', bumper: 'B' };
+const _CAM_LETTERS = { chase: 'CHASE', hood: 'HOOD', bumper: 'BUMPER' };
 const _CAM_NEXT    = { chase: 'hood', hood: 'bumper', bumper: 'chase' };
 
-_camBtn.addEventListener('click', () => {
+if (_camBtn) _camBtn.addEventListener('click', () => {
   camMode = _CAM_NEXT[camMode];
-  _camLetter.textContent = _CAM_LETTERS[camMode];
+  if (_camLetter) _camLetter.textContent = _CAM_LETTERS[camMode];
   _camBtn.className = camMode === 'hood' ? 'cam-hood' : camMode === 'bumper' ? 'cam-bumper' : '';
   camera.fov = camMode === 'hood' ? 120 : camMode === 'bumper' ? 72 : 60;
   camera.updateProjectionMatrix();
