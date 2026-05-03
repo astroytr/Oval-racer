@@ -201,6 +201,67 @@ document.getElementById('btn-pre-settings').addEventListener('click',()=>{ switc
 // ══════════════════════════════════════════
 function showRespawnPrompt(show){
   document.getElementById('respawn-btn').classList.toggle('active', show);
+  const rwBtn = document.getElementById('rewind-btn');
+  if(rwBtn) rwBtn.classList.toggle('active', show);
+}
+
+// ── REWIND FEATURE ────────────────────────────────────────────────────
+// Replays car backwards through the rewind buffer, then restores velocity.
+// The rewind "warp point" is chosen ~1.5s before the crash (far enough
+// back to be safely on track, with the original speed at that moment).
+let _rewindAnimating = false;
+
+function doRewind(){
+  if(_rewindAnimating) return;
+  if(!_rewindBuf || _rewindBuf.length < 10) { doRespawn(); return; }
+
+  _rewindAnimating = true;
+  showRespawnPrompt(false);
+
+  // Pick restore point: 90 frames back (~1.5s), clamped to buffer start
+  const restoreIdx = Math.max(0, _rewindBuf.length - 90);
+  const restoreState = _rewindBuf[restoreIdx];
+
+  // Animate backwards through buffer frames — play in reverse at 3× speed
+  let playIdx = _rewindBuf.length - 1;
+  const STEP = 3; // skip frames for fast rewind feel
+
+  function rewindTick(){
+    if(playIdx <= restoreIdx){
+      // Animation done — restore the car to that state
+      car.px      = restoreState.px;
+      car.pz      = restoreState.pz;
+      car.heading = restoreState.heading;
+      car.vx      = restoreState.vx;
+      car.vz      = restoreState.vz;
+      car.av      = restoreState.av;
+      car.speed   = restoreState.speed;
+      car.gear    = restoreState.gear;
+      car.rpm     = restoreState.rpm;
+      // Clear crash state
+      car.barrierHit=false; car._sfSmooth=0; car._hbGrip=1.0;
+      car._dftWasOn=false; car._dftLockedVz=0; car._dftGripTimer=0;
+      car.oversteer=false; car.understeer=false; car.spinning=false; car.gearJustShifted=null;
+      setDrift(false);
+      _clearMarks();
+      unfreezeRewindBuffer();
+      _rewindAnimating = false;
+      return;
+    }
+
+    // Scrub car position visually during animation
+    const s = _rewindBuf[playIdx];
+    car.px      = s.px;
+    car.pz      = s.pz;
+    car.heading = s.heading;
+    carGroup.position.set(car.px, 0, car.pz);
+    carGroup.rotation.y = car.heading;
+
+    playIdx -= STEP;
+    requestAnimationFrame(rewindTick);
+  }
+
+  requestAnimationFrame(rewindTick);
 }
 
 function doRespawn(){
@@ -215,6 +276,7 @@ function doRespawn(){
   car.barrierHit=false; car._sfSmooth=0; car._hbGrip=1.0; car._dftWasOn=false; car._dftLockedVz=0; car._dftGripTimer=0; setDrift(false);
   showRespawnPrompt(false);
   _clearMarks();
+  unfreezeRewindBuffer();
 }
 
 // Back to start/finish line — keeps lap count and timer running, just teleports position
@@ -230,6 +292,7 @@ function doBackToStartLine(){
   car.barrierHit=false; car._sfSmooth=0; car._hbGrip=1.0; car._dftWasOn=false; car._dftLockedVz=0; car._dftGripTimer=0; setDrift(false);
   showRespawnPrompt(false);
   _clearMarks();
+  unfreezeRewindBuffer();
   // Mark lap dirty so this lap doesn't count as a clean time
   car.lapDirty=true;
   addPenalty(0, 'BACK TO START');
@@ -239,6 +302,13 @@ document.getElementById('respawn-btn').addEventListener('click', doRespawn);
 document.getElementById('respawn-btn').addEventListener('touchstart', e=>{
   e.preventDefault(); doRespawn();
 },{passive:false});
+
+// Rewind button — replay backwards then restore velocity
+const _rewindBtnEl = document.getElementById('rewind-btn');
+if(_rewindBtnEl){
+  _rewindBtnEl.addEventListener('click', doRewind);
+  _rewindBtnEl.addEventListener('touchstart', e=>{ e.preventDefault(); doRewind(); },{passive:false});
+}
 
 // Extra close/back buttons on sensitivity, controls pages
 ['btn-close-sens','btn-close-sens-top','btn-close-ctrl'].forEach(id=>{

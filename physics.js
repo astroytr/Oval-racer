@@ -774,6 +774,29 @@ function pak(a,Fz){return pakF(a,Fz);}
 // If something doesn't happen naturally → fix the INPUTS (FzR, Iz, MU), not the output.
 // ─────────────────────────────────────────────────────────────────────────────
 
+// ── REWIND BUFFER ──────────────────────────────────────────────────
+// Stores rolling ~5s of car states at ~60fps. Each entry is a snapshot.
+// On barrier hit, we freeze the buffer so doRewind() can replay it backwards.
+const REWIND_MAX = 360;   // ~6s at 60fps
+const _rewindBuf = [];    // circular array of state snapshots
+let _rewindFrozen = false; // true after crash — stop recording, allow replay
+
+function _pushRewindState(){
+  if(_rewindFrozen) return;
+  // Only store if car is moving and on-track
+  _rewindBuf.push({
+    px: car.px, pz: car.pz,
+    heading: car.heading,
+    vx: car.vx, vz: car.vz,
+    av: car.av, speed: car.speed,
+    gear: car.gear, rpm: car.rpm,
+  });
+  if(_rewindBuf.length > REWIND_MAX) _rewindBuf.shift();
+}
+
+function freezeRewindBuffer(){ _rewindFrozen = true; }
+function unfreezeRewindBuffer(){ _rewindFrozen = false; _rewindBuf.length = 0; }
+
 let lastTime=null;
 function physics(dt){
   const thr = (P.T||P.KeyW||P.ArrowUp)   ? 1 : 0;
@@ -1259,6 +1282,7 @@ function physics(dt){
   car.speed = car.vz;
 
   ghostTick();
+  _pushRewindState();
 
   const ci=closestTrackIdx(car.px,car.pz),cp=CENTRE[ci];
   const dx=car.px-cp.x,dz=car.pz-cp.y;
@@ -1277,6 +1301,7 @@ function physics(dt){
       addPenalty(5.0,'+5.0s BARRIER');
       // Store respawn point — track centre at impact index, facing track direction
       car.respawnIdx=ci;
+      freezeRewindBuffer();
       showRespawnPrompt(true);
       setDrift(false); // cancel drift on crash
     }
@@ -1867,7 +1892,7 @@ const _UI_CLICK_IDS = new Set([
 ]);
 // Driving/gameplay buttons — never play click on these
 const _NO_CLICK_IDS = new Set([
-  'btn-thr','btn-brk','btn-left','btn-right','btn-hb',
+  'btn-thr','btn-brk','btn-left','btn-right','btn-hb','rewind-btn',
 ]);
 document.addEventListener('click', e => {
   const el = e.target.closest('button, .opt-tab, .lb-subtab, .assist-btn, .cm-el, .track-slide-card');
@@ -2170,7 +2195,7 @@ function buildMirrors(){
       body.pre-start #top-bar, body.pre-start #minimap-wrap,
       body.pre-start #best-display, body.pre-start #spd-wrap,
       body.pre-start #time-wrap, body.pre-start #delta-wrap,
-      body.pre-start #rpm-wrap, body.pre-start #respawn-btn
+      body.pre-start #rpm-wrap, body.pre-start #respawn-btn, body.pre-start #rewind-btn
       { display:block !important; visibility:hidden !important; }
     `;
     document.head.appendChild(tmpStyle);
