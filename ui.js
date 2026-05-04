@@ -1,4 +1,26 @@
 // ══════════════════════════════════════════
+// HOME SCREEN — mode cards swipe & track section
+// ══════════════════════════════════════════
+(function(){
+  const scroll = document.getElementById('mode-cards-scroll');
+  const dots   = document.querySelectorAll('.mode-dot');
+  const cards  = document.querySelectorAll('.mode-card');
+  if(scroll){
+    scroll.addEventListener('scroll', () => {
+      const idx = Math.round(scroll.scrollLeft / (scroll.scrollWidth / Math.max(cards.length,1)));
+      dots.forEach((d,i) => d.classList.toggle('active', i===idx));
+    }, {passive:true});
+  }
+  // Mode card tap — only Time Attack is active
+  document.getElementById('modecard-timeattack')?.addEventListener('click', () => {
+    cards.forEach(c => c.classList.remove('active'));
+    document.getElementById('modecard-timeattack').classList.add('active');
+    dots[0]?.classList.add('active');
+    dots[1]?.classList.remove('active');
+  });
+})();
+
+// ══════════════════════════════════════════
 // BACK TO START MENU — prompt save if unsaved best lap
 // ══════════════════════════════════════════
 document.getElementById('btn-back-start').addEventListener('click',()=>{
@@ -200,9 +222,13 @@ document.getElementById('btn-pre-settings').addEventListener('click',()=>{ switc
 // RESPAWN SYSTEM
 // ══════════════════════════════════════════
 function showRespawnPrompt(show){
+  // Legacy: keep individual button classes in sync for any code that checks them
   document.getElementById('respawn-btn').classList.toggle('active', show);
   const rwBtn = document.getElementById('rewind-btn');
   if(rwBtn) rwBtn.classList.toggle('active', show);
+  // New: crash overlay
+  const overlay = document.getElementById('crash-overlay');
+  if(overlay) overlay.classList.toggle('active', show);
 }
 
 // ── REWIND FEATURE ────────────────────────────────────────────────────
@@ -218,8 +244,29 @@ function doRewind(){
   _rewindAnimating = true;
   showRespawnPrompt(false);
 
-  // Pick restore point: 90 frames back (~1.5s), clamped to buffer start
-  const restoreIdx = Math.max(0, _rewindBuf.length - 90);
+  // Find a safe restore point: scan backwards from crash looking for a frame
+  // where the car was well inside the track (dist from centreline < TW/2 - 1m).
+  // Start from 60 frames back so we never restore to the crash moment itself.
+  // If no safe point found, fall back to full respawn.
+  let restoreIdx = -1;
+  const safeMargin = (typeof TW !== 'undefined') ? TW / 2 - 1.5 : 10;
+  const scanStart = Math.max(0, _rewindBuf.length - 60);
+  for(let i = scanStart; i >= 0; i--){
+    const s = _rewindBuf[i];
+    if(typeof closestTrackIdx === 'function' && typeof CENTRE !== 'undefined'){
+      const ci = closestTrackIdx(s.px, s.pz);
+      const cp = CENTRE[ci];
+      const dx = s.px - cp.x, dz = s.pz - cp.y;
+      const dist = Math.sqrt(dx*dx + dz*dz);
+      if(dist < safeMargin){
+        restoreIdx = i;
+        break;
+      }
+    } else {
+      restoreIdx = i; break; // fallback if helpers not available
+    }
+  }
+  if(restoreIdx < 0){ _rewindAnimating = false; unfreezeRewindBuffer(); doRespawn(); return; }
   const restoreState = _rewindBuf[restoreIdx];
 
   // Animate backwards through buffer frames — play in reverse at 3× speed
