@@ -69,92 +69,32 @@ window.onunhandledrejection=function(e){
 <div id="prestart-scanlines"></div>
 
 <div id="prestart-ui">
-
-  <!-- ═══ HOME SCREEN ═══ -->
-  <div id="home-screen">
-
-    <!-- Logo -->
-    <div id="hs-logo">
-      <div id="hs-logo-eyebrow">ARCADE RACER</div>
-      <div id="hs-logo-title">APEX<span id="hs-logo-dot">·</span>RUSH</div>
-      <div id="hs-logo-sub">3D RACING SIMULATOR</div>
+  <div id="player-name-wrap">
+    <div id="player-name-display">
+      <span>DRIVER</span>
+      <b id="pname-lbl">PLAYER</b>
     </div>
-
-    <!-- Driver badge top-left -->
-    <div id="player-name-wrap">
-      <div id="player-name-display">
-        <span>DRIVER</span>
-        <b id="pname-lbl">PLAYER</b>
-      </div>
-      <button id="btn-edit-name" title="Edit name">✏️</button>
+    <button id="btn-edit-name" title="Edit name">✏️</button>
+  </div>
+  <div id="name-edit-popup">
+    <input id="name-input" type="text" maxlength="8" placeholder="Enter name..." spellcheck="false" autocomplete="off">
+    <div id="name-popup-btns">
+      <button id="btn-save-name">SAVE</button>
+      <button id="btn-close-name">CLOSE</button>
     </div>
-    <div id="name-edit-popup">
-      <input id="name-input" type="text" maxlength="8" placeholder="Enter name..." spellcheck="false" autocomplete="off">
-      <div id="name-popup-btns">
-        <button id="btn-save-name">SAVE</button>
-        <button id="btn-close-name">CLOSE</button>
-      </div>
+  </div>
+</div>
+
+<div id="track-card">
+  <canvas id="track-card-canvas"></canvas>
+  <div id="track-card-info">
+    <div>
+      <div id="track-card-name">OVAL</div>
+      <div id="track-card-sub">Short oval · 1 layout</div>
     </div>
-
-    <!-- MODE CARDS -->
-    <div id="mode-section">
-      <div id="mode-label">SELECT MODE</div>
-      <div id="mode-cards-scroll">
-
-        <!-- Card 1: Time Attack -->
-        <div class="mode-card active" id="modecard-timeattack">
-          <div class="mode-card-glow"></div>
-          <div class="mode-card-badge">AVAILABLE</div>
-          <div class="mode-card-icon">⏱</div>
-          <div class="mode-card-title">TIME ATTACK</div>
-          <div class="mode-card-desc">Race the clock. Beat your ghost.<br>Perfect every corner.</div>
-          <div class="mode-card-cta">TAP TO SELECT →</div>
-        </div>
-
-        <!-- Card 2: Coming Soon -->
-        <div class="mode-card locked" id="modecard-elimination">
-          <div class="mode-card-badge locked">COMING SOON</div>
-          <div class="mode-card-icon">🏆</div>
-          <div class="mode-card-title">ELIMINATION</div>
-          <div class="mode-card-desc">Last one standing wins.<br>Multiplayer mayhem.</div>
-          <div class="mode-card-cta locked">LOCKED</div>
-        </div>
-
-      </div>
-      <div id="mode-dots">
-        <div class="mode-dot active"></div>
-        <div class="mode-dot"></div>
-      </div>
-    </div>
-
-    <!-- TRACK SECTION -->
-    <div id="track-section">
-      <div id="track-section-label">CIRCUIT</div>
-      <div id="track-card">
-        <canvas id="track-card-canvas"></canvas>
-        <div id="track-card-info">
-          <div>
-            <div id="track-card-name">OVAL</div>
-            <div id="track-card-sub">Short oval · 1 layout</div>
-          </div>
-          <div id="track-card-arrow">▾ CHANGE</div>
-        </div>
-      </div>
-    </div>
-
-    <!-- BOTTOM ACTIONS -->
-    <div id="hs-actions">
-      <button id="btn-start">
-        <div id="btn-start-inner">
-          <div id="btn-start-icon">▶</div>
-          <div id="btn-start-label">START RACE</div>
-          <div id="btn-start-sub">TAP TO BEGIN</div>
-        </div>
-      </button>
-      <button id="btn-pre-settings">⚙ SETTINGS</button>
-    </div>
-
-  </div><!-- end #home-screen -->
+    <div id="track-card-arrow">▾ CHANGE</div>
+  </div>
+</div>
 
 <div id="track-picker-overlay"></div>
 <div id="track-picker">
@@ -218,9 +158,8 @@ window.onunhandledrejection=function(e){
   <div id="opt-pages">
 
 <div class="opt-page active" id="page-general">
-  <div class="opt-section-title">🚗 RACE</div>
   <div class="opt-row">
-    <button id="btn-goto-ghost" class="opt-action-btn blue">👻 GHOST SETTINGS →</button>
+    <button id="btn-goto-ghost" style="width:100%;font-family:'Courier New',monospace;font-size:.7rem;letter-spacing:.12em;padding:10px;border-radius:8px;cursor:pointer;background:rgba(180,200,255,.08);border:1px solid rgba(180,200,255,.25);color:#aaddff;">👻 GHOST SETTINGS →</button>
   </div>
   <div class="opt-row">
     <div style="display:flex;align-items:center;justify-content:space-between;">
@@ -229,24 +168,22 @@ window.onunhandledrejection=function(e){
         <div class="opt-desc" id="mm-mode-desc">Fixed: full track always visible</div>
       </div>
       <div style="display:flex;gap:6px;">
-        <button id="btn-mm-fixed" class="opt-toggle-btn active">FIXED</button>
-        <button id="btn-mm-moving" class="opt-toggle-btn">MOVING</button>
+        <button id="btn-mm-fixed" style="font-family:'Courier New',monospace;font-size:.58rem;letter-spacing:.08em;padding:4px 9px;border-radius:6px;cursor:pointer;background:rgba(48,224,96,.15);border:1px solid #30e060;color:#30e060;">FIXED</button>
+        <button id="btn-mm-moving" style="font-family:'Courier New',monospace;font-size:.58rem;letter-spacing:.08em;padding:4px 9px;border-radius:6px;cursor:pointer;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.2);color:#aaa;">MOVING</button>
       </div>
     </div>
   </div>
-  <div class="opt-section-title">🎮 HUD</div>
   <div class="opt-row">
-    <button id="btn-customize" class="opt-action-btn subtle">🎨 CUSTOMIZE HUD</button>
-  </div>
-  <div class="opt-section-title">⚠️ ACTIONS</div>
-  <div class="opt-row">
-    <button id="btn-respawn-manual" class="opt-action-btn red">↺ BACK TO STARTING LINE</button>
+    <button id="btn-customize" style="width:100%;font-family:'Courier New',monospace;font-size:.7rem;letter-spacing:.12em;padding:10px;border-radius:8px;cursor:pointer;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.15);color:#aaa;">🎨 CUSTOMIZE HUD</button>
   </div>
   <div class="opt-row">
-    <button id="btn-end-session" class="opt-action-btn gold">⏹ END SESSION</button>
+    <button id="btn-respawn-manual" style="width:100%;font-family:'Courier New',monospace;font-size:.7rem;letter-spacing:.12em;padding:10px;border-radius:8px;cursor:pointer;background:rgba(255,80,80,.12);border:1px solid rgba(255,80,80,.35);color:#ff6666;">↺ BACK TO STARTING LINE</button>
   </div>
-  <div style="margin-top:18px;">
-    <button id="btn-back-start" class="opt-action-btn red">← START MENU</button>
+  <div class="opt-row">
+    <button id="btn-end-session" style="width:100%;font-family:'Courier New',monospace;font-size:.7rem;letter-spacing:.12em;padding:10px;border-radius:8px;cursor:pointer;background:rgba(240,192,64,.08);border:1px solid rgba(240,192,64,.25);color:#f0c040;">⏹ END SESSION</button>
+  </div>
+  <div style="margin-top:18px;display:flex;gap:10px;flex-wrap:wrap;">
+    <button id="btn-back-start" style="font-family:'Courier New',monospace;font-size:.68rem;letter-spacing:.1em;padding:8px 14px;border-radius:8px;cursor:pointer;background:rgba(220,50,50,.18);border:1.5px solid #e63946;color:#ff5566;font-weight:700;touch-action:manipulation;">← START MENU</button>
   </div>
 </div>
 
@@ -485,26 +422,13 @@ window.onunhandledrejection=function(e){
 </div>
 
 <div id="wrong-way">WRONG WAY</div>
-
-<!-- CRASH OVERLAY — appears on barrier hit -->
-<div id="crash-overlay">
-  <div id="crash-overlay-title">💥 CRASH</div>
-  <div id="crash-overlay-btns">
-    <button id="rewind-btn">
-      <span id="rewind-btn-icon">⏪</span>
-      <div id="rewind-btn-text">
-        <div id="rewind-btn-lbl">REWIND</div>
-        <div id="rewind-btn-sub">Restore last safe position</div>
-      </div>
-    </button>
-    <button id="respawn-btn">
-      <span id="respawn-btn-icon">↺</span>
-      <div id="respawn-btn-text">
-        <div id="respawn-btn-lbl">RESPAWN</div>
-        <div id="respawn-btn-sub">Place at crash point</div>
-      </div>
-    </button>
-  </div>
+<div id="respawn-btn">
+  <div id="respawn-btn-icon">↺</div>
+  <div id="respawn-btn-lbl">TAP TO<br>RESPAWN</div>
+</div>
+<div id="rewind-btn">
+  <div id="rewind-btn-icon">⏪</div>
+  <div id="rewind-btn-lbl">REWIND</div>
 </div>
 <div id="ghost-label" style="display:none;position:fixed;pointer-events:none;z-index:10;font-family:'Courier New',monospace;font-size:.6rem;font-weight:bold;letter-spacing:.1em;color:rgba(180,200,255,0.9);text-shadow:0 0 8px rgba(100,150,255,0.8);transform:translateX(-50%);white-space:nowrap;"></div>
 <div id="countdown-overlay"><div id="countdown-num"></div></div>
@@ -519,6 +443,14 @@ window.onunhandledrejection=function(e){
     </div>
   </div>
 </div>
+<button id="btn-start">
+  <div id="btn-start-inner">
+    <div id="btn-start-icon">▶</div>
+    <div id="btn-start-label">START</div>
+    <div id="btn-start-sub">TAP TO BEGIN</div>
+  </div>
+</button>
+
 <div id="btn-left"  class="btn ctrl-btn">◀</div>
 <div id="btn-right" class="btn ctrl-btn">▶</div>
 <div id="btn-hb"    class="btn ctrl-btn hb-btn">HANDBRAKE</div>
